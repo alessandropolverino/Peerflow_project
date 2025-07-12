@@ -1,0 +1,45 @@
+# This file is used to define the services for the testing environment.
+
+services:
+  assignment-service-mongo-test:
+    image: mongo:8.0.9
+    container_name: assignment-service-mongo-test
+    ports:
+      - "27022:27017"  # Different port to avoid conflicts, edit port
+    volumes:
+      - assignment-service-data-test:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=assignment-service-db-test
+    networks:
+      - assignment-service-network-test-network
+    restart: unless-stopped
+
+  assignment-service-test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: assignment-service-test-runner
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+    env_file:
+      - .env.test
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@assignment-service-mongo-test:27017/assignment-service-db-test?authSource=admin
+      - NODE_ENV=test
+      - PYTHONPATH=/app
+    depends_on:
+      - assignment-service-mongo-test
+    networks:
+      - assignment-service-network-test-network
+
+volumes:
+  assignment-service-data-test:
+    driver: local
+
+networks:
+  assignment-service-network-test-network:
+    driver: bridge
+    name: assignment-service-network-test-network

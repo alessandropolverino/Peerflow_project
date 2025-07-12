@@ -1,0 +1,141 @@
+@startuml
+autonumber
+actor "Teacher" as Teacher
+participant "Web Application" as WebApp
+participant "Orchestrator" as Orch
+participant "Auth & Profiling Service" as Auth
+participant "Assignment Service" as Assign
+participant "Review Assignment Service" as RevAssign
+participant "Review Assignment DB" as RevAssignDB
+participant "Notification Service" as Notif
+participant "Involved Students" as Students
+
+' 1. Teacher Defines Rubric (FR-PRV-001)
+Teacher -> WebApp : Navigates to Assignment Detail Page
+activate WebApp
+WebApp -> Orch : HTTP GET /api/assignments/{id}/status (Bearer Token: Teacher's Access Token)
+activate Orch
+Orch -> Auth : verifyJWT(Access Token)
+activate Auth
+Auth --> Orch : Valid (Teacher ID, Role)
+deactivate Auth
+Orch -> Assign : getAssignmentStatus(AssignmentID)
+activate Assign
+Assign --> Orch : Assignment Status (e.g., "submission deadline passed", "no rubric finalized")
+deactivate Assign
+Orch --> WebApp : Assignment Status
+deactivate Orch
+
+alt If no rubric finalized and deadline passed (FR-PRV-001.UI)
+  WebApp -> Teacher : Displays "Define Rubric" Button
+  Teacher -> WebApp : Clicks "Define Rubric" Button
+  WebApp -> Teacher : Displays Rubric Creation Interface (criteria, scoring range)
+  Teacher -> WebApp : Enters Rubric Details (title, description, min/max score per criterion)
+  Teacher -> WebApp : Clicks "Save Rubric" Button
+
+  WebApp -> Orch : HTTP POST /api/assignments/{id}/rubric (Rubric Details)
+  activate Orch
+  Orch -> Auth : verifyJWT(Access Token)
+  activate Auth
+  Auth --> Orch : Valid (Teacher ID, Role)
+  deactivate Auth
+  Orch -> Assign : getAssignmentStatus(AssignmentID)
+  activate Assign
+  Assign --> Orch : Assignment Status (re-check for eligibility)
+  deactivate Assign
+
+  Orch -> RevAssign : defineRubric(TeacherID, AssignmentID, Rubric Details)
+  activate RevAssign
+  RevAssign -> RevAssign : Validate Rubric (at least one criterion, valid range) (FR-PRV-001.BL)
+  RevAssign -> RevAssignDB : Store Rubric Record (FR-PRV-001.BL)
+  activate RevAssignDB
+  RevAssignDB --> RevAssign : Rubric Stored Confirmation
+  deactivate RevAssignDB
+  RevAssign --> Orch : Rubric Creation Success Confirmation
+  deactivate RevAssign
+  Orch --> WebApp : Rubric Creation Success Message
+  deactivate Orch
+  WebApp -> Teacher : Displays Defined Rubric on Assignment Page (FR-PRV-001.UI)
+end
+
+' 2. Teacher Initiates Peer Review (FR-PRV-004)
+Teacher -> WebApp : Navigates to Assignment Detail Page (again, or remains)
+activate WebApp
+WebApp -> Orch : HTTP GET /api/assignments/{id}/status (Bearer Token)
+activate Orch
+Orch -> Auth : verifyJWT(Access Token)
+activate Auth
+Auth --> Orch : Valid (Teacher ID, Role)
+deactivate Auth
+Orch -> Assign : getAssignmentStatus(AssignmentID)
+activate Assign
+Assign --> Orch : Assignment Status (e.g., "submissions closed", "rubric finalized")
+deactivate Assign
+Orch -> RevAssign : getRubric(AssignmentID)
+activate RevAssign
+RevAssign --> Orch : Finalized Rubric Details
+deactivate RevAssign
+Orch --> WebApp : Assignment Status & Rubric Info
+deactivate Orch
+
+alt If submissions closed and rubric finalized (FR-PRV-004.UI)
+  WebApp -> Teacher : Displays "Setup Peer Review" Button
+  Teacher -> WebApp : Clicks "Setup Peer Review" Button
+  WebApp -> Teacher : Displays Peer Review Configuration Interface (reviewers per submission, assignment mode) (FR-PRV-004.UI)
+
+  alt If Manual Assignment Mode Selected (FR-PRV-004.UI)
+    WebApp -> Orch : HTTP GET /api/assignments/{id}/submitted-students (Bearer Token)
+    activate Orch
+    Orch -> Auth : verifyJWT(Access Token)
+    activate Auth
+    Auth --> Orch : Valid (Teacher ID, Role)
+    deactivate Auth
+    Orch -> Assign : getSubmittedStudents(AssignmentID)
+    activate Assign
+    Assign --> Orch : List of Submitted Students
+    deactivate Assign
+    Orch --> WebApp : List of Submitted Students
+    deactivate Orch
+    WebApp -> Teacher : Displays list of students for manual pairing
+    Teacher -> WebApp : Selects peer pairings
+  end
+
+  Teacher -> WebApp : Enters configuration (e.g., # reviewers), selects mode, defines pairings (if manual)
+  Teacher -> WebApp : Clicks "Start Peer Review" Button
+
+  WebApp -> Orch : HTTP POST /api/assignments/{id}/peer-review-start (Config: reviewers, mode, pairings)
+  activate Orch
+  Orch -> Auth : verifyJWT(Access Token)
+  activate Auth
+  Auth --> Orch : Valid (Teacher ID, Role)
+  deactivate Auth
+  Orch -> Assign : getAssignmentSubmissions(AssignmentID)
+  activate Assign
+  Assign --> Orch : List of Submissions (for pairing)
+  deactivate Assign
+  Orch -> RevAssign : initiatePeerReview(TeacherID, AssignmentID, Submissions, Config)
+  activate RevAssign
+  RevAssign -> RevAssign : Validate Config (FR-PRV-004.BL)
+  RevAssign -> RevAssign : Perform Peer Assignment (auto or manual, no self-review) (FR-PRV-004.BL)
+  RevAssign -> RevAssignDB : Store Peer Review Pairing Records (FR-PRV-004.BL)
+  activate RevAssignDB
+  RevAssignDB --> RevAssign : Pairing Records Stored Confirmation
+  deactivate RevAssignDB
+  RevAssign -> Assign : updateAssignmentStatus("Peer Review in Progress")
+  activate Assign
+  Assign --> RevAssign : Status Updated Confirmation
+  deactivate Assign
+  RevAssign --> Orch : Peer Review Initiation Success Confirmation
+  deactivate RevAssign
+
+  Orch -> Notif : sendNotification(Assigned Reviews, Student IDs) (FR-PRV-005)
+  activate Notif
+  Notif -> Students : Email Notification (Peer Review Assigned)
+  deactivate Notif
+
+  Orch --> WebApp : Peer Review Initiation Success Message
+  deactivate Orch
+  WebApp -> Teacher : Displays Success Message / Updates Assignment Status (FR-PRV-004.UI)
+end
+deactivate WebApp
+@enduml

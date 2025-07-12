@@ -1,0 +1,53 @@
+# This file is used to define the services for the development environment.
+
+services:
+  auth-mongo:
+    image: mongo:8.0.9
+    container_name: auth-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - auth-mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=auth-service
+    networks:
+      - auth-dev-network
+    restart: unless-stopped
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: auth-service
+    ports:
+      - "3000:3000"    
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@auth-mongo:27017/auth-service?authSource=admin
+      - NODE_ENV=development
+    depends_on:
+      - auth-mongo
+    networks:
+      - auth-dev-network
+    restart: unless-stopped
+
+    
+
+
+
+volumes:
+  auth-mongo-data:
+    driver: local
+
+networks:
+  auth-dev-network:
+    driver: bridge
+    name: auth-dev-network
+  peerflow-global-network:
+    external: true
+    name: peerflow-global-network
+  

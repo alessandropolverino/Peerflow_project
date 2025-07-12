@@ -1,0 +1,52 @@
+@startuml
+title Student View of Results
+
+|Student (Submitter)|
+start
+:See the assignment as "Completed";
+:Navigates to view feedback;
+
+|System|
+:Receives request to view feedback;
+:Retrieves student's original 
+      submission content;
+:Retrieves all completed 
+peer review records for 
+        this submission;
+:Calculates average scores 
+  per criterion and overall 
+      aggregated score;
+:Displays submitted work, 
+  average scores, overall 
+      aggregated score;
+:Displays list of individual 
+  peer reviews received;
+
+|Student (Submitter)|
+:   Views overall feedback 
+and list of individual reviews;
+if (Wants to view details of 
+  a specific peer review?) then (yes)
+  :Selects a specific individual 
+    peer review from the list;
+
+  |System|
+  :Receives request for specific 
+        peer review details;
+  :Retrieves details of the selected 
+                  peer review;
+  :   Displays for each criterion, 
+  the score and explanation given 
+      by that specific reviewer;
+
+  |Student (Submitter)|
+  : Views detailed feedback 
+  from the selected reviewer;
+else (no)
+  ' Student is done viewing the summary
+endif
+
+|Student (Submitter)|
+stop
+
+@enduml

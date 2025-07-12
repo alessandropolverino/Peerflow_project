@@ -1,0 +1,106 @@
+[
+  {
+    "ReviewerStudentID": "studente1",
+    "RevieweeSubmissionID": "subm1",
+    "Status": "Completed",
+    "ReviewResults": {
+      "PerCriterionScoresAndJustifications": {
+        "Chiarezza": {
+          "Score": 8,
+          "Justification": "Il testo è molto chiaro e di facile comprensione, la terminologia è usata correttamente."
+        },
+        "Organizzazione": {
+          "Score": 7,
+          "Justification": "Struttura logica e ben articolata, anche se qualche sezione potrebbe essere riorganizzata per maggiore fluidità."
+        },
+        "ProfonditàAnalisi": {
+          "Score": 6,
+          "Justification": "L'analisi è buona, ma non approfondisce tutti gli aspetti del problema come ci si aspetterebbe."
+        },
+        "Originalità": {
+          "Score": 9,
+          "Justification": "L'approccio è innovativo e presenta spunti di riflessione molto interessanti e personali."
+        }
+      },
+      "ReviewTimestamp": "2025-06-06T14:45:11.980000Z"
+    }
+  },
+  {
+    "ReviewerStudentID": "studente1",
+    "RevieweeSubmissionID": "subm2",
+    "Status": "Completed",
+    "ReviewResults": {
+      "PerCriterionScoresAndJustifications": {
+        "Chiarezza": {
+          "Score": 6,
+          "Justification": "Ci sono alcuni punti che risultano ambigui o poco chiari, richiedono una riformulazione."
+        },
+        "Organizzazione": {
+          "Score": 5,
+          "Justification": "La sequenza delle idee è a volte discontinua, rendendo difficile seguire il filo del discorso."
+        },
+        "ProfonditàAnalisi": {
+          "Score": 8,
+          "Justification": "Analisi dettagliata e ben supportata da dati, mostra una profonda comprensione del tema."
+        },
+        "Originalità": {
+          "Score": 7,
+          "Justification": "Presenta buoni spunti, ma si basa su teorie e concetti già noti senza un'elaborazione del tutto personale."
+        }
+      },
+      "ReviewTimestamp": "2025-06-05T10:30:00.000000Z"
+    }
+  },
+  {
+    "ReviewerStudentID": "studente2",
+    "RevieweeSubmissionID": "subm1",
+    "Status": "Completed",
+    "ReviewResults": {
+      "PerCriterionScoresAndJustifications": {
+        "Chiarezza": {
+          "Score": 9,
+          "Justification": "Eccezionale chiarezza espositiva, ogni concetto è spiegato in modo impeccabile."
+        },
+        "Organizzazione": {
+          "Score": 9,
+          "Justification": "Struttura perfetta, fluida e logica, che guida il lettore attraverso l'intero elaborato."
+        },
+        "ProfonditàAnalisi": {
+          "Score": 9,
+          "Justification": "L'analisi è estremamente approfondita e copre ogni sfaccettatura necessaria con grande competenza."
+        },
+        "Originalità": {
+          "Score": 10,
+          "Justification": "Opera estremamente originale, propone idee e prospettive completamente nuove e stimolanti."
+        }
+      },
+      "ReviewTimestamp": "2025-06-04T20:15:30.123000Z"
+    }
+  },
+  {
+    "ReviewerStudentID": "studente3",
+    "RevieweeSubmissionID": "subm2",
+    "Status": "InProgress",
+    "ReviewResults": {
+      "PerCriterionScoresAndJustifications": {
+        "Chiarezza": {
+          "Score": 0,
+          "Justification": "Revisione non ancora iniziata per questo criterio."
+        },
+        "Organizzazione": {
+          "Score": 0,
+          "Justification": "Revisione non ancora iniziata per questo criterio."
+        },
+        "ProfonditàAnalisi": {
+          "Score": 0,
+          "Justification": "Revisione non ancora iniziata per questo criterio."
+        },
+        "Originalità": {
+          "Score": 0,
+          "Justification": "Revisione non ancora iniziata per questo criterio."
+        }
+      },
+      "ReviewTimestamp": "2025-06-06T17:00:00.000000Z"
+    }
+  }
+]

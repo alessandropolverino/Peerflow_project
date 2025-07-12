@@ -1,0 +1,25 @@
+# This file is used to define the services for the development environment.
+
+services:
+  orchestrator-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: orchestrator-service
+    ports:
+      - "3001:3000" # edit port
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    networks:
+      - orchestrator-service-network
+    restart: unless-stopped
+
+networks:
+  orchestrator-service-network:
+    driver: bridge
+    name: orchestrator-service-network
+  

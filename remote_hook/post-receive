@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# post-receive hook
+# Trigger the Jenkins multibranch pipeline only for specific branches.
+#
+# Installation:
+#   1. Save this file as '.git/hooks/post-receive' in your remote repository.
+#   2. Make the file executable: 'chmod +x .git/hooks/post-receive'
+
+# --- CONFIGURATION ---
+# Jenkins Parameters
+JENKINS_URL="http://localhost:8080"
+JOB_NAME="peerflow_pipeline"
+JENKINS_USER="aspd1"
+# Jenkins API Token generated in Manage Jenkins > user > Security > API Token
+JENKINS_TOKEN="112091644700b0303998cbcb110829878a"
+
+# --- HOOK LOGIC ---
+
+# Function to check if branch should trigger Jenkins
+should_trigger_jenkins() {
+    local branch_name="$1"
+    
+    # Check if branch matches allowed patterns:
+    # - production
+    # - dev
+    # - release/X.X.X (where X can be any number)
+    if [[ "$branch_name" == "production" ]] || \
+       [[ "$branch_name" == "dev" ]] || \
+       [[ "$branch_name" =~ ^release/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        return 0  # Should trigger
+    else
+        return 1  # Should not trigger
+    fi
+}
+
+# Read the push information from stdin
+trigger_needed=false
+while read oldrev newrev refname; do
+    # Extract branch name from refname (refs/heads/branch-name -> branch-name)
+    branch_name=$(echo "$refname" | sed 's|refs/heads/||')
+    
+    echo " "
+    echo "================================================================="
+    echo "Processing push to branch: $branch_name"
+    echo " "
+    
+    # Check if this branch should trigger Jenkins
+    if should_trigger_jenkins "$branch_name"; then
+        echo "✅ Branch '$branch_name' matches trigger criteria"
+        trigger_needed=true
+    else
+        echo "❌ Branch '$branch_name' does not match trigger criteria (skipping)"
+    fi
+done
+
+# Only trigger Jenkins if at least one qualifying branch was pushed
+if [ "$trigger_needed" = true ]; then
+    echo " "
+    echo "================================================================="
+    echo "🚀 Triggering Jenkins pipeline scan..."
+    echo " "
+    curl -X POST "${JENKINS_URL}/job/${JOB_NAME}/build" \
+      --user "${JENKINS_USER}:${JENKINS_TOKEN}" \
+      --silent
+
+    if [ $? -eq 0 ]; then
+        echo "✅ Jenkins pipeline triggered successfully!"
+    else
+        echo "❌ Failed to trigger Jenkins pipeline"
+    fi
+    echo " "
+    echo "================================================================="
+    echo " "
+else
+    echo " "
+    echo "================================================================="
+    echo "ℹ️  No qualifying branches pushed - Jenkins trigger skipped"
+    echo "   Qualifying branches: production, dev, release/X.X.X"
+    echo "================================================================="
+    echo " "
+fi

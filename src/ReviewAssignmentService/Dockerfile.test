@@ -1,0 +1,13 @@
+FROM python:3.11-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY ./requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install --no-cache-dir pytest pytest-cov pytest-watch
+
+# The src and test directories will be mounted as volumes
+
+# Run pytest with coverage and watch mode
+CMD ["pytest", "/app/test", "-v", "--cov=/app/src", "--cov-report=term-missing", "--tb=short"]

@@ -1,0 +1,61 @@
+@startuml
+
+left to right direction
+
+package "PeerFlow Client" {
+  rectangle "Web Application" as WebApp
+}
+
+
+
+rectangle "Orchestrator" as Orch
+
+WebApp --> Orch
+
+
+
+package "PeerFlow Microservices" {
+  rectangle "Auth & Profiling Service" as Auth
+  rectangle "Assignment Service" as Assign
+  rectangle "Review Assignment Service" as RevAssign
+  rectangle "Review Processing Service" as RevProc
+  rectangle "Assignment Submission Service" as AssignSubm
+  rectangle "Notification Service" as Notif 
+}
+
+' Entry Point interactions
+Orch --> Auth
+Orch --> Assign
+Orch --> RevAssign
+Orch --> RevProc
+Orch --> AssignSubm
+Orch --> Notif
+
+WebApp --> Auth
+
+
+
+
+
+package "Data layer" {
+  database "Auth DB" as AuthDB
+  database "Assignment DB" as AssignDB
+  database "Review Assignment DB" as RevAssignDB
+  database "Review Processing DB" as RevProcDB
+  database "Assignment Submission DB" as AssignSubmDB
+  database "File Storage" as FileStorage
+}
+
+' Data layer interactions
+Auth --> AuthDB
+Assign --> AssignDB
+RevAssign --> RevAssignDB
+RevProc --> RevProcDB
+AssignSubm --> AssignSubmDB
+AssignSubm --> FileStorage
+
+
+Orch --> FileStorage
+WebApp --> FileStorage
+
+@enduml

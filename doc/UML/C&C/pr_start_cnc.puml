@@ -1,0 +1,82 @@
+@startuml
+
+package "PeerFlow Client" {
+  component "Web Application" as WebApp
+}
+
+component "Orchestrator" as Orch
+interface "IAPIGateway" as IAPIG
+' Orchestrator provides API Gateway interface
+Orch -up- IAPIG
+
+package "PeerFlow Microservices" {
+  component "Auth & Profiling Service" as Auth
+  interface "IAuthorization" as IAuthz
+  ' Needed if manual pairing requires student list
+  interface "IGetStudents" as IGetStudents 
+  ' Auth Service provides authorization interface
+  Auth -up- IAuthz
+  Auth -up- IGetStudents
+
+
+  component "Assignment Service" as Assign
+  ' To check submission deadline status
+  interface "IAssignmentStatus" as IAssignStatus
+  ' To get list of students involved in assignment
+  interface "IAssignmentStudents" as IAssignStudents
+  ' Assignment Service provides its interfaces
+  Assign -up- IAssignStatus
+  Assign -up- IAssignStudents
+
+
+  component "Review Assignment Service" as RevAssign
+  interface "IRubricManagement" as IRubricManage
+  interface "IPeerReviewInitiation" as IPeerReviewInitiate
+  ' Review Assignment Service provides its interfaces
+  RevAssign -up- IRubricManage
+  RevAssign -up- IPeerReviewInitiate
+
+
+  component "Notification Service" as Notif
+  interface "INotification" as INotif
+  ' Notification Service provides its interface
+  Notif -up- INotif
+
+
+  component "Other Services" as OtherServices
+  interface "IOtherServicesAPI" as IOtherAPI
+  OtherServices -up- IOtherAPI
+}
+
+package "Data Layer" {
+  database "Review Assignment DB" as RevAssignDB
+  database "Auth DB" as AuthDB
+  database "Assignment DB" as AssignDB
+}
+
+' WebApp uses Orchestrator as API Gateway
+WebApp -down-> IAPIG : HTTP POST /api/assignments/{id}/rubric\nHTTP GET /api/assignments/{id}/status\nHTTP GET /api/assignments/{id}/students\nHTTP POST /api/assignments/{id}/peer-review-start
+
+' Orchestrator uses Auth Service for authorization
+Orch -down-> IAuthz : verifyJWT()
+
+' Orchestrator interacts with Assignment Service
+Orch -down-> IAssignStatus : getAssignmentStatus()
+Orch -down-> IAssignStudents : getAssignmentStudents()
+
+' Orchestrator interacts with Review Assignment Service
+Orch -down-> IRubricManage : defineRubric(),\neditRubric(),\ndeleteRubric()
+Orch -down-> IPeerReviewInitiate : initiatePeerReview()
+
+' Orchestrator interacts with Notification Service
+Orch -down-> INotif : sendNotification()
+
+
+' Interactions with DBs
+RevAssign -down-> RevAssignDB : Create/Update Rubric,\nStore Peer Review Assignments
+Auth -down-> AuthDB : Read User Profiles
+Assign -down-> AssignDB : Read Assignment Status,\nRead Students Involved
+
+"PeerFlow Microservices" -[hidden]down- "Data Layer"
+
+@enduml

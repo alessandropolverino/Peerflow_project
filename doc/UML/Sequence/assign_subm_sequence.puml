@@ -1,0 +1,54 @@
+@startuml
+autonumber
+actor "Student" as Student
+participant "Web Application" as WebApp
+participant "Orchestrator" as Orch
+participant "Auth & Profiling Service" as Auth
+participant "Assignment Submission Service" as AssignSubm
+participant "Assignment Submission DB" as AssignSubmDB
+database "File Storage DB" as FileStorageDB
+
+Student -> WebApp : Navigates to Assignment Submission Page
+activate WebApp
+WebApp -> Student : Displays Submission Form (text, file upload)
+Student -> WebApp : Enters Text, Selects/Uploads Files 
+Student -> WebApp : Clicks "Submit Work" Button 
+
+' Step 1: WebApp submits combined text and attachments to Orchestrator
+WebApp -> Orch : HTTP POST (Text, Attachment Data)
+activate Orch
+
+' Step 2: Orchestrator authorizes the request
+note right of Orch
+  Assuming the Access Token is valid, otherwise 
+  the request would fail with an error.
+end note
+Orch -> Orch : verifyJWT(Student's Access Token)
+
+
+alt Attachment(s) Present
+  ' Step 3a: Orchestrator uploads file(s) directly to FileStorageDB
+  Orch -> FileStorageDB : uploadFile(Attachment Data)
+  activate FileStorageDB
+  FileStorageDB --> Orch : File Reference(s) (e.g., URL, ID)
+  deactivate FileStorageDB
+  Note right: Optimized for large files / high load 
+end
+
+' Step 3b (or Step 3 if no attachments): Orchestrator calls Assignment Submission Service with references
+Orch -> AssignSubm : submitAssignment(StudentID, AssignmentID, Text, File Reference(s), Timestamp)
+activate AssignSubm
+AssignSubm -> AssignSubm : Validate Submission (e.g., before deadline) 
+AssignSubm -> AssignSubmDB : Store Submission Record (Text, File Ref(s), Timestamp) 
+activate AssignSubmDB
+AssignSubmDB --> AssignSubm : Submission Record Stored Confirmation
+deactivate AssignSubmDB
+AssignSubm --> Orch : Submission Success Confirmation
+deactivate AssignSubm
+
+Orch --> WebApp : Submission Success Message
+deactivate Orch
+WebApp -> Student : Displays Success Message / Redirects to Assignment Details
+deactivate WebApp
+
+@enduml

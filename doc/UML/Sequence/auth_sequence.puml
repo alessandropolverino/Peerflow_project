@@ -1,0 +1,77 @@
+@startuml
+autonumber
+actor "User" as U
+participant "Web Application" as WebApp
+participant "Auth & Profiling Service" as Auth
+participant "Auth DB" as AuthDB
+participant "Orchestrator" as Orch
+participant "Other Services" as OtherServices
+
+U -> WebApp : Navigates to Login Page 
+WebApp -> U : Displays Login Form (email, password) 
+U -> WebApp : Submits Credentials (email, password) 
+
+activate WebApp
+WebApp -> Auth : login(email, password) [Direct Call]
+activate Auth
+Auth -> AuthDB : Query User Credentials
+activate AuthDB
+AuthDB --> Auth : User Data (hashed password, role)
+deactivate AuthDB
+
+Auth -> Auth : Validate Hashed Password
+alt Successful Validation
+  Auth -> Auth : Generate JWT (Access Token, Refresh Token)
+  Auth --> WebApp : JWT Token (Access, Refresh) & User Role
+  deactivate Auth
+  WebApp -> WebApp : Store JWT Tokens (e.g., localStorage, http-only cookie)
+  WebApp -> U : Redirect to Role-Specific Dashboard
+
+  U -> WebApp : Request Protected Resource (e.g., View Assignments)
+  activate WebApp
+  WebApp -> Orch : HTTP GET /protected-resource [Bearer Token: Access Token]
+  alt Does Not Know Auth&Profiling Public Key OR Public Key Cache Timed Out
+    Orch -> Auth : getPublicKey() [Direct Call]
+    activate Auth
+    Auth --> Orch : Public Key Data
+    deactivate Auth
+  end
+
+  activate Orch
+  Orch -> Orch : Validate Access Token Signature And Validity
+  alt Token Valid
+    Orch -> Orch : Get (User ID, Role) from Access Token
+    
+    deactivate Auth
+    Orch -> OtherServices : Make necessary calls to other services [User ID, Role]
+    activate OtherServices
+    OtherServices --> Orch : Data
+    deactivate OtherServices
+    Orch --> WebApp : Data
+    deactivate Orch
+    WebApp -> U : Display Data
+  else Token Expired (but Refresh Token exists)
+    Orch --> WebApp : Expired / Invalid
+    WebApp -> Auth : refreshToken(Refresh Token) [Bearer Token: Access Token]
+    Auth -> Auth : Validate Refresh Token & Issue New JWT
+    Auth --> WebApp : New JWT Token (Access, Refresh)
+    deactivate Auth
+    WebApp -> WebApp : Update Stored JWT Tokens
+    WebApp -> Orch : Retry HTTP GET /protected-resource [Bearer Token: New Access Token]
+    ' Steps 15-20 would repeat for the retried request
+  else Token Invalid (no refresh or invalid refresh)
+    Orch --> WebApp : Expired / Invalid
+    activate Auth
+    WebApp -> Auth : refreshToken(Refresh Token) [Bearer Token: Access Token]
+    Auth -> Auth : Validate Refresh Token & Issue New JWT
+    Auth --> WebApp : Invalid Refresh Token
+    deactivate Auth
+    WebApp -> U : Display Error Message 
+  end
+else Invalid Credentials
+  Auth --> WebApp : Error: Invalid Credentials 
+  deactivate Auth
+  WebApp -> U : Display Error Message
+  deactivate WebApp
+end
+@enduml

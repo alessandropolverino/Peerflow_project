@@ -1,0 +1,151 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: peerflow-app-test
+resources:
+- ../../base
+- namespace.yaml
+
+# Image patches
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: auth-profiling-service
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: giosuciaravola/peerflow-auth-profiling-service:test
+
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: assignment-service
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: giosuciaravola/peerflow-assignment-service:test
+
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: assignment-submission-service
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: giosuciaravola/peerflow-assignment-submission-service:test
+
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: review-assignment-service
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: giosuciaravola/peerflow-review-assignment-service:test
+
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: processing-service
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: giosuciaravola/peerflow-processing-service:test
+
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: orchestrator-service
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: giosuciaravola/peerflow-orchestrator-service:test
+
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: peerflow-ui-service
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: giosuciaravola/peerflow-ui-service:test
+
+# Service patches - making services accessible externally
+- target:
+    version: v1
+    kind: Service
+    name: auth-profiling-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30110
+
+- target:
+    version: v1
+    kind: Service
+    name: assignment-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30120
+
+- target:
+    version: v1
+    kind: Service
+    name: assignment-submission-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30130
+
+- target:
+    version: v1
+    kind: Service
+    name: seaweedfs-filer
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30131
+
+- target:
+    version: v1
+    kind: Service
+    name: review-assignment-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30140
+
+- target:
+    version: v1
+    kind: Service
+    name: processing-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30150
+
+- target:
+    version: v1
+    kind: Service
+    name: orchestrator-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30160
+
+- target:
+    version: v1
+    kind: Service
+    name: peerflow-ui-service
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/nodePort
+      value: 30170

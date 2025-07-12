@@ -1,0 +1,23 @@
+@startuml
+
+package "Assignment Submission Service (MongoDB Instance)" {
+  class Submission {
+    + _id: ObjectId
+    --
+    - TextContent: Text (Mandatory)
+    - SubmissionTimestamp: DateTime
+    - Status: String <<Enum: submitted, not submitted>>
+    - AssignmentID: String
+    - StudentID: String
+    - Attachments: List<AttachmentDocument>
+  }
+
+  class AttachmentDocument <<Embedded Document>> {
+    - FileName: String
+    - FileType: String <<Enum: PDF, TXT, JPG>>
+    - FileReference: String
+  }
+}
+
+
+@enduml

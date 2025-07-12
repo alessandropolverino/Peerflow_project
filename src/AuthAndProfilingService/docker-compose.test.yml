@@ -1,0 +1,45 @@
+# This file is used to define the services for the testing environment.
+
+services:
+  auth-mongo-test:
+    image: mongo:8.0.9
+    container_name: auth-mongo-test
+    ports:
+      - "27018:27017"  # Different port to avoid conflicts
+    volumes:
+      - auth-mongo-test-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=auth-service-test
+    networks:
+      - auth-test-network
+    restart: unless-stopped
+
+  auth-test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: auth-test-runner
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+    env_file:
+      - .env.test
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@auth-mongo-test:27017/auth-service-test?authSource=admin
+      - NODE_ENV=test
+      - PYTHONPATH=/app
+    depends_on:
+      - auth-mongo-test
+    networks:
+      - auth-test-network
+
+volumes:
+  auth-mongo-test-data:
+    driver: local
+
+networks:
+  auth-test-network:
+    driver: bridge
+    name: auth-test-network

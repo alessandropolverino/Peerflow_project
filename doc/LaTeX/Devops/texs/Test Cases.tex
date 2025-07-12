@@ -1,0 +1,418 @@
+\chapter{Test Cases}
+
+\section{Unit Tests}
+
+\subsection{Authentication \& Profiling Service}
+
+\begin{longtable}{|p{0.15\textwidth}|p{0.75\textwidth}|}
+\caption{Authentication \& Profiling Service Test Cases and Descriptions}\\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{r}{{Continued on next page}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+UT-SYS-001 & Verifies the root endpoint of the application, ensuring it returns a successful response and the expected welcome message. \\
+\hline
+UT-SYS-002 & Verifies the health check endpoint, ensuring it indicates a healthy status and a smooth operation message. \\
+\hline
+UT-SYS-003 & Verifies the public key endpoint, ensuring that the endpoint returns a public key string upon successful generation or an error if key generation fails. \\
+\hline
+UT-SYS-004 & Verifies successful user signup. It ensures that a new user can be registered with valid credentials and that the response contains the user's details. \\
+\hline
+UT-SYS-005 & Verifies signup with a duplicate email. It ensures that the system prevents the creation of multiple accounts with the same email address. \\
+\hline
+UT-SYS-006 & Verifies signup with invalid data. It ensures that the system handles missing or improperly formatted signup information. \\
+\hline
+UT-SYS-007 & Verifies successful user login. It ensures that a registered user can log in with correct credentials and receive access and refresh tokens. \\
+\hline
+UT-SYS-008 & Verifies login with an invalid email. It ensures that the system rejects login attempts with non-existent email addresses. \\
+\hline
+UT-SYS-009 & Verifies login with an invalid password. It ensures that the system rejects login attempts with incorrect passwords for existing users. \\
+\hline
+UT-SYS-010 & Verifies successful token refresh. It ensures that a valid refresh token can be used to obtain new access and refresh tokens. \\
+\hline
+UT-SYS-011 & Verifies token refresh with an access token. It ensures that the system correctly identifies and rejects attempts to refresh using an access token instead of a refresh token. \\
+\hline
+UT-SYS-012 & Verifies requests to non-existent endpoints. It ensures that the application returns a 404 status for unknown routes. \\
+\hline
+UT-SYS-013 & Verifies invalid HTTP methods on existing endpoints. It ensures that the application correctly handles unsupported HTTP methods for specific routes. \\
+\hline
+UT-SYS-014 & Verifies endpoints with malformed JSON. It ensures that the application properly handles requests with invalid JSON payloads. \\
+\hline
+UT-SYS-015 & Verifies endpoints with missing content type. It ensures that the application gracefully handles requests where the content type header is absent. \\
+\hline
+UT-SYS-016 & Verifies the presence of CORS headers. It ensures that the application includes appropriate Cross-Origin Resource Sharing headers in its responses. \\
+\hline
+UT-SYS-017 & Verifies the creation and verification of JWT tokens. It ensures that access tokens can be successfully generated and their payloads correctly verified. \\
+\hline
+UT-SYS-018 & Verifies successful retrieval of the current user's profile. It ensures that an authenticated user can fetch their own details. \\
+\hline
+UT-SYS-019 & Verifies retrieval of the current user without a token. It ensures that access to the current user endpoint is denied without proper authentication. \\
+\hline
+UT-SYS-020 & Verifies successful retrieval of students. It ensures that the system can list users with the 'Student' role. \\
+\hline
+UT-SYS-021 & Verifies retrieval of students when no students exist. It ensures that the system returns an empty list if no users with the 'Student' role are found. \\
+\hline
+UT-SYS-022 & Verifies successful retrieval of a user by ID. It ensures that a specific user's profile can be fetched using their unique identifier. \\
+\hline
+UT-SYS-023 & Verifies retrieval of a user by ID when the user doesn't exist. It ensures that the system correctly indicates when a requested user ID is not found. \\
+\hline
+UT-SYS-024 & Verifies successful batch retrieval of users. It ensures that multiple user profiles can be fetched simultaneously using a list of IDs. \\
+\hline
+UT-SYS-025 & Verifies batch retrieval with some valid and some invalid IDs. It ensures that the system returns only the valid user profiles when a mix of IDs is provided. \\
+\hline
+UT-SYS-026 & Verifies batch retrieval without a request body. It ensures that the system handles requests to the batch user retrieval endpoint that lack the necessary payload. \\
+\hline
+\end{longtable}
+
+\subsection{Assignment Service}
+
+\begin{longtable}{|p{0.15\textwidth}|p{0.75\textwidth}|}
+\caption{Assignment Service Test Cases and Descriptions}\\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{r}{{Continued on next page}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+UT-ASG-001 & This test case verifies that the root endpoint is accessible. It ensures the service returns a welcome message. \\
+\hline
+UT-ASG-002 & This test case verifies that the health check endpoint is accessible. It ensures the service reports a healthy status. \\
+\hline
+UT-ASG-003 & This test case verifies that retrieving all assignments returns an empty list when no assignments exist. It ensures the service handles the absence of records gracefully. \\
+\hline
+UT-ASG-004 & This test case verifies that a specific assignment can be successfully retrieved by its ID. It ensures the service provides the correct assignment details. \\
+\hline
+UT-ASG-005 & This test case verifies that retrieving a non-existent assignment by ID results in an appropriate error. It ensures the service correctly handles requests for unknown assignments. \\
+\hline
+UT-ASG-006 & This test case verifies that assignments can be successfully retrieved for a specific teacher. It ensures the service provides a list of assignments associated with the teacher. \\
+\hline
+UT-ASG-007 & This test case verifies that retrieving assignments for a teacher with no assigned tasks returns an empty list. It ensures the service correctly handles scenarios where a teacher has no assignments. \\
+\hline
+UT-ASG-008 & This test case verifies that assignments can be successfully retrieved for a specific student. It ensures the service provides a list of assignments associated with the student. \\
+\hline
+UT-ASG-009 & This test case verifies that retrieving assignments for a student with no assigned tasks returns an empty list. It ensures the service correctly handles scenarios where a student has no assignments. \\
+\hline
+UT-ASG-010 & This test case verifies that assignment creation fails gracefully when a database error occurs. It ensures the service handles database insertion failures. \\
+\hline
+UT-ASG-011 & This test case verifies that assignment creation fails when provided with invalid data. It ensures the service enforces data validation rules. \\
+\hline
+UT-ASG-012 & This test case verifies that an existing assignment can be successfully updated. It ensures the service correctly modifies assignment details. \\
+\hline
+UT-ASG-013 & This test case verifies that attempting to update a non-existent assignment results in an appropriate error. It ensures the service correctly handles updates for unknown assignments. \\
+\hline
+UT-ASG-014 & This test case verifies that assignment updates fail gracefully when a database error occurs. It ensures the service handles database update failures. \\
+\hline
+UT-ASG-015 & This test case verifies that multiple assignments can be retrieved for a teacher. It ensures the service correctly returns all relevant assignments. \\
+\hline
+UT-ASG-016 & This test case verifies that multiple assignments can be retrieved for a student. It ensures the service correctly returns all relevant assignments. \\
+\hline
+UT-ASG-017 & This test case verifies that an assignment can be partially updated. It ensures the service correctly applies partial modifications. \\
+\hline
+\end{longtable}
+
+\subsection{Assignment Submission Service}
+
+\begin{longtable}{|p{0.2\textwidth}|p{0.7\textwidth}|}
+\caption{Assignment Submission Service Test Cases and Descriptions}\\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{r}{{Continued on next page}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+UT-ASG-SUB-001 & This test case verifies that the root endpoint returns the correct service message. Tests basic API connectivity. \\
+\hline
+UT-ASG-SUB-002 & This test case verifies that the health check endpoint returns healthy status. Tests service health monitoring functionality. \\
+\hline
+UT-ASG-SUB-003 & This test case verifies successful retrieval of submission data by submission ID. Tests database query functionality for individual submissions. \\
+\hline
+UT-ASG-SUB-004 & This test case verifies successful retrieval of multiple submissions by assignment ID. Tests database query functionality for assignment-related submissions. \\
+\hline
+UT-ASG-SUB-005 & This test case verifies proper handling when no submissions exist for an assignment. Tests empty result scenarios in submission queries. \\
+\hline
+UT-ASG-SUB-006 & This test case verifies successful upload and creation of new assignment submissions. Tests submission creation functionality with valid data. \\
+\hline
+UT-ASG-SUB-007 & This test case verifies proper handling when attempting to upload duplicate submissions. Tests duplicate prevention logic in submission creation. \\
+\hline
+UT-ASG-SUB-008 & This test case verifies proper error handling when database insertion fails. Tests database error scenarios during submission creation. \\
+\hline
+UT-ASG-SUB-009 & This test case verifies successful retrieval of specific student submissions by assignment and student ID. Tests targeted submission queries. \\
+\hline
+UT-ASG-SUB-010 & This test case verifies proper handling when student hasn't submitted for an assignment. Tests missing submission scenarios. \\
+\hline
+UT-ASG-SUB-011 & This test case verifies proper validation when required submission data is missing. Tests input validation for incomplete data. \\
+\hline
+UT-ASG-SUB-012 & This test case verifies proper validation when invalid file types are provided. Tests file type validation in submission attachments. \\
+\hline
+UT-ASG-SUB-013 & This test case verifies successful submission upload with empty attachments list. Tests submission creation with minimal attachment data. \\
+\hline
+UT-ASG-SUB-014 & This test case verifies proper validation when required query parameters are missing. Tests parameter validation for submission retrieval. \\
+\hline
+UT-ASG-SUB-015 & This test case verifies assignment submission upload functionality through integration testing. Tests end-to-end submission creation process. \\
+\hline
+\end{longtable}
+
+\subsection{Review Assignment Service}
+
+\begin{longtable}{|p{0.15\textwidth}|p{0.75\textwidth}|}
+\caption{Peer Review Assignment Service Test Cases and Descriptions}\\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{r}{{Continued on next page}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+UT-PRW-001 & This test case verifies that the root endpoint returns the correct welcome message. This test case verifies the basic functionality of the application's main route. \\
+\hline
+UT-PRW-002 & This test case verifies that the health check endpoint responds appropriately. This test case verifies the application's health monitoring capability. \\
+\hline
+UT-PRW-003 & This test case verifies that all peer review assignments can be retrieved successfully. This test case verifies the functionality to fetch multiple peer review records. \\
+\hline
+UT-PRW-004 & This test case verifies that retrieving all peer reviews returns an empty list when no assignments exist. This test case verifies the behavior when the database contains no peer review data. \\
+\hline
+UT-PRW-005 & This test case verifies that peer reviews can be retrieved by providing a batch of assignment IDs. This test case verifies the batch retrieval functionality for multiple specific assignments. \\
+\hline
+UT-PRW-006 & This test case verifies that batch retrieval returns an empty list when no matching assignments are found. This test case verifies the behavior when batch queries yield no results. \\
+\hline
+UT-PRW-007 & This test case verifies that a specific peer review assignment can be retrieved by assignment ID. This test case verifies the single assignment retrieval functionality. \\
+\hline
+UT-PRW-008 & This test case verifies that retrieving a non-existent peer review assignment is handled properly. This test case verifies the error handling for missing assignment data. \\
+\hline
+UT-PRW-009 & This test case verifies that retrieving a peer review assignment handles missing rubric data appropriately. This test case verifies the error handling when associated rubric information is unavailable. \\
+\hline
+UT-PRW-010 & This test case verifies that a new peer review assignment can be created successfully. This test case verifies the complete creation workflow including rubric and assignment data. \\
+\hline
+UT-PRW-011 & This test case verifies that creating a peer review assignment prevents duplicate assignments. This test case verifies the validation logic for existing assignment IDs. \\
+\hline
+UT-PRW-012 & This test case verifies that peer review assignment creation handles rubric creation failures. This test case verifies the error handling during the rubric creation process. \\
+\hline
+UT-PRW-013 & This test case verifies that peer review assignment creation handles assignment creation failures. This test case verifies the error handling during the peer review assignment creation process. \\
+\hline
+UT-PRW-014 & This test case verifies that peer review results can be submitted successfully. This test case verifies the functionality to record review outcomes and scores. \\
+\hline
+UT-PRW-015 & This test case verifies that submitting peer review results handles cases with no existing pairings. This test case verifies the error handling when no review pairings are configured. \\
+\hline
+UT-PRW-016 & This test case verifies that submitting peer review results handles cases where the specified pairing doesn't exist. This test case verifies the validation of reviewer-reviewee relationships. \\
+\hline
+UT-PRW-017 & This test case verifies that peer review assignments can be updated successfully. This test case verifies the modification functionality for existing assignments. \\
+\hline
+UT-PRW-018 & This test case verifies that peer review assignment updates handle database operation failures. This test case verifies the error handling during the update process. \\
+\hline
+UT-PRW-019 & This test case verifies that a new peer review assignment can be created through the assignment endpoint. This test case verifies the alternative creation pathway for peer review assignments. \\
+\hline
+\end{longtable}
+
+\subsection{Review Processing Service}
+
+\begin{longtable}{|p{0.15\textwidth}|p{0.75\textwidth}|}
+\caption{Results \& Monitoring Service Test Cases and Descriptions}\\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{r}{{Continued on next page}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+UT-RES-001 & This test case verifies that the root endpoint returns the correct welcome message. It ensures the main application entry point is functioning properly. \\
+\hline
+UT-RES-002 & This test case verifies that the health check endpoint returns the proper health status. It confirms the service monitoring functionality is operational. \\
+\hline
+UT-RES-003 & This test case verifies that the statistics calculation endpoint processes valid review pairings successfully. It ensures the core statistical processing functionality works with complete review data. \\
+\hline
+UT-RES-004 & This test case verifies that the statistics calculation endpoint handles empty pairings lists correctly. It ensures the system gracefully processes scenarios with no review data. \\
+\hline
+UT-RES-005 & This test case verifies that the statistics calculation endpoint processes in-progress reviews appropriately. It ensures the system correctly handles incomplete review submissions. \\
+\hline
+UT-RES-006 & This test case verifies that the aggregated assignment data retrieval endpoint returns correct information for existing assignments. It ensures assignment-level statistics can be successfully retrieved. \\
+\hline
+UT-RES-007 & This test case verifies that the aggregated assignment data retrieval endpoint handles non-existent assignments properly. It ensures appropriate error handling for missing assignment data. \\
+\hline
+UT-RES-008 & This test case verifies that the aggregated submission data retrieval endpoint returns correct information for existing submissions. It ensures submission-level statistics can be successfully retrieved. \\
+\hline
+UT-RES-009 & This test case verifies that the aggregated submission data retrieval endpoint handles non-existent submissions properly. It ensures appropriate error handling for missing submission data. \\
+\hline
+UT-RES-010 & This test case verifies that the aggregated review data retrieval endpoint returns all reviews for a specific submission. It ensures comprehensive review data retrieval functionality. \\
+\hline
+UT-RES-011 & This test case verifies that the aggregated review data retrieval endpoint returns specific reviewer-submission pair data. It ensures targeted review data retrieval functionality. \\
+\hline
+UT-RES-012 & This test case verifies that the aggregated review data retrieval endpoint handles submissions with no reviews properly. It ensures appropriate error handling when no review data exists. \\
+\hline
+UT-RES-013 & This test case verifies that the aggregated review data retrieval endpoint handles non-existent reviewer-submission pairs properly. It ensures appropriate error handling for missing specific review combinations. \\
+\hline
+UT-RES-014 & This test case verifies that the statistics calculation endpoint handles malformed JSON input appropriately. It ensures proper validation of request data format. \\
+\hline
+UT-RES-015 & This test case verifies that the statistics calculation endpoint handles missing required parameters correctly. It ensures proper validation of required input parameters. \\
+\hline
+\end{longtable}
+\clearpage
+
+\section{Integration Tests}
+
+\begin{longtable}{|p{0.15\textwidth}|p{0.75\textwidth}|}
+\caption{Integration Test Cases and Descriptions}\\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endfirsthead
+
+\multicolumn{2}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{Test Case ID} & \textbf{Description} \\
+\hline
+\endhead
+
+\hline \multicolumn{2}{r}{{Continued on next page}} \\
+\endfoot
+
+\hline
+\endlastfoot
+
+UT-INT-001 & This test case verifies that students can retrieve their assigned assignments. The test ensures proper assignment listing functionality for student users. \\
+\hline
+UT-INT-002 & This test case verifies that teachers can create new assignments with involved students. The test validates assignment creation functionality with dynamic deadline setting. \\
+\hline
+UT-INT-003 & This test case verifies that students can view detailed information about specific assignments. The test ensures proper assignment detail retrieval for student users. \\
+\hline
+UT-INT-004 & This test case verifies that teachers can view comprehensive assignment details including submissions and peer reviews. The test validates enhanced assignment information access for teachers. \\
+\hline
+UT-INT-005 & This test case verifies that students can submit their assignment work with text content. The test ensures proper assignment submission functionality. \\
+\hline
+UT-INT-006 & This test case verifies that students can retrieve their own submission for a specific assignment. The test validates submission retrieval functionality for student users. \\
+\hline
+UT-INT-007 & This test case verifies that teachers can view all submissions for a specific assignment. The test ensures comprehensive submission overview for teachers. \\
+\hline
+UT-INT-008 & This test case verifies that students can access peer review assignments when available. The test validates peer review functionality and handles cases where no peer review exists. \\
+\hline
+UT-INT-009 & This test case verifies that teachers can close assignment submissions by updating the deadline. The test ensures proper assignment status management and deadline enforcement. \\
+\hline
+UT-INT-010 & This test case verifies that teachers can create peer review assignments with rubrics and deadlines. The test validates peer review setup functionality for collaborative assessment. \\
+\hline
+\end{longtable}
+\clearpage
+
+\section{Load tests}
+
+\begin{justify}
+    This load test validates the PeerFlow educational platform's performance and scalability under concurrent user load by simulating 100 students registering, authenticating, and submitting assignments simultaneously while ensuring sub-500ms response times across all operations.
+\end{justify}
+
+\begin{itemize}
+    \item \textbf{Test Workflow}
+    \begin{itemize}
+        \item \textbf{Phase 1: Setup}
+        \begin{itemize}
+            \item \textit{Teacher Account Creation:} Create teacher account with unique credentials.
+            \item \textit{Teacher Authentication:} Log in as the teacher and obtain an authentication token.
+        \end{itemize}
+
+        \item \textbf{Phase 2: Student Registration Wave}
+        \begin{itemize}
+            \item \textit{Student Registration (100 iterations):}
+            \begin{itemize}
+                \item Register unique student accounts with generated credentials.
+                \item \textbf{Delay:} 1ms between each registration.
+                \item Store student IDs and credentials for subsequent phases.
+            \end{itemize}
+        \end{itemize}
+
+        \item \textbf{Phase 3: Authentication Storm}
+        \begin{itemize}
+            \item \textit{Student Login (100 iterations):}
+            \begin{itemize}
+                \item Authenticate all registered students.
+                \item \textbf{Delay:} 1ms between each login.
+                \item Capture and store authentication tokens.
+            \end{itemize}
+        \end{itemize}
+
+        \item \textbf{Phase 4: Assignment Creation}
+        \begin{itemize}
+            \item \textit{Assignment Creation:} Teacher creates an assignment for all 100 students.
+            \begin{itemize}
+                \item Set a 7-day submission deadline.
+                \item Include all registered student IDs.
+            \end{itemize}
+        \end{itemize}
+        
+        \item \textbf{Phase 5: Submission Flood}
+        \begin{itemize}
+            \item \textit{Assignment Submission (100 iterations):}
+            \begin{itemize}
+                \item All students submit unique content to the assignment.
+                \item \textbf{Delay:} 1ms between each submission.
+                \item Generate timestamped submission content.
+            \end{itemize}
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{Validation Checks}
+    \begin{itemize}
+        \item \textbf{Performance Validation}
+        \begin{itemize}
+            \item \textit{Response Time:} All API calls must complete within 750ms.
+            \item \textit{Status Codes:} Verify successful HTTP status codes (200, 201) for all operations.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}

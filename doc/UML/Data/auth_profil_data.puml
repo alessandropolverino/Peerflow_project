@@ -1,0 +1,15 @@
+@startuml
+
+package "AuthAndProfiling Service (MongoDB Instance)" {
+  class User {
+    + _id: ObjectId
+    --
+    - Name: String
+    - Surname: String
+    - Email: String <<Unique>>
+    - PasswordHash: String
+    - Role: String <<Enum: Teacher, Student>>
+  }
+}
+
+@enduml

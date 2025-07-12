@@ -1,0 +1,1 @@
+from .main import assign_submission_router

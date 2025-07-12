@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Only add template for regular commits (not merges, amends, etc.)
+case "$2,$3" in
+  ,|template,)
+    # Check if commit message is empty or contains only comments
+    if [ ! -s "$1" ] || ! grep -q '^[^#]' "$1"; then
+      # Get current branch name for context
+      BRANCH=$(git rev-parse --abbrev-ref HEAD)
+      
+      # Determine type based on branch name
+      TYPE=""
+      if [[ $BRANCH == feature/* ]]; then
+        TYPE="feat"
+      elif [[ $BRANCH == fix/* ]]; then
+        TYPE="fix"
+      elif [[ $BRANCH == dev/* ]]; then
+        TYPE="dev"
+      elif [[ $BRANCH == release/* ]]; then
+        TYPE="chore"
+      elif [[ $BRANCH == production/* ]]; then
+        TYPE="production"
+      else
+        TYPE="feat"
+      fi
+      
+      # Create dynamic template
+      cat > "$1" << TEMPLATE
+[$TYPE]: 
+
+# Why this change is needed:
+# - 
+
+# Related to: 
+# - Issue #
+# - Branch: $BRANCH
+
+# --- COMMIT END ---
+# Remember: Use imperative mood ("Add" not "Added")
+# Max 50 chars for first line, 72 for body lines
+TEMPLATE
+    fi
+    ;;
+esac

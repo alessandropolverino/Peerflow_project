@@ -1,0 +1,61 @@
+@startuml
+
+title Student Assignment Submission
+
+|Student|
+start
+:Views list of their assignments;
+:Selects a specific assignment;
+
+|System|
+:Receives request for assignment details;
+:Retrieves assignment details;
+:Displays assignment details to Student;
+
+|Student|
+:Views assignment details;
+if (  Submission deadline 
+NOT passed AND Work 
+   NOT yet submitted?) then (yes, can submit)
+  :Clicks "Submit Work";
+  :Enters textual input;
+  if (Wants to upload file?) then (yes)
+    :Uploads file (PDF, TXT, JPG);
+  else (no)
+  endif
+  :Clicks "Submit";
+
+  |System|
+  :Receives submission attempt;
+  :Validates input;
+  if (Input is valid?) then (no, Invalid Input)
+    |System|
+    :Displays error message;
+    |Student|
+    :Sees error message;
+    stop
+  else (yes, Valid Submission)
+    |System|
+    :Stores text 
+     and file(s);
+    :Records timestamp 
+         of submission;
+    :Marks assignment 
+       as "submitted" 
+      for the student;
+    :       Displays success 
+        message and shows 
+    submitted work to Student;
+    |Student|
+    :Sees success message 
+      and submitted work;
+    stop
+  endif
+else (no, cannot submit)
+  |Student|
+  :Sees that submission
+       is not possible;
+  stop
+endif
+
+@enduml

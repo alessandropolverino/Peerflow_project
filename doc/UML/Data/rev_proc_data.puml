@@ -1,0 +1,40 @@
+@startuml
+package "Review Processing Service (MongoDB Instance)" {
+  class AggregatedByAssignmentResult {
+    + _id: ObjectId
+    --
+    - AssignmentID: String
+    - OverallAverageScore: Double
+    - PerCriterionAverageScores: Map<String, Double>
+    - ScoreDistributions: Map<String, Map<Integer, Integer>>
+  }
+
+  ' This class represents the aggregated results 
+  ' of peer reviews for each submission (aka for each student).
+  class AggregatedBySubmissionResult { 
+    + _id: ObjectId
+    --
+    - SubmissionID: String
+    - OverallAverageScore: Double
+    ' How many reviewers have submitted reviews 
+    ' for this submission.
+    - NumberOfCompletedReviews: Integer
+    ' How many reviewers have been assigned to 
+    ' review this submission.
+    - NumberOfAssignedReviews: Integer
+    - PerCriterionAverageScores: Map<String, Double>
+  }
+
+  ' This class represents the aggregated results
+  ' of peer reviews for each student (aka for each reviewer).
+  ' (a.k.a. the score given by the reviewer to each submission)
+  class AggregatedByReviewResult {
+    + _id: ObjectId
+    --
+    - ReviewerStudentID: String
+    - RevieweeSubmissionID: String
+    - OverallAverageScore: Double
+  }
+}
+
+@enduml

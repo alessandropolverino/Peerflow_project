@@ -1,0 +1,47 @@
+\chapter{DevOps Pratices}
+
+This chapter details the main DevOps practices. For each practice, a definition is provided, followed by an explanation of how it is enacted within the described CI/CD pipeline.
+
+\begin{itemize}
+    \item \textbf{Build Automation}
+    \begin{itemize}
+        \item \textit{Definition:} Build Automation is the practice of automating the process of preparing code for deployment to a live environment. The specific tools used are often tied to the programming language or platform selected. Its benefits include creating fast, consistent, and repeatable builds that are more reliable than manual processes.
+        \item \textit{Enactment in the Pipeline:} The pipeline automates code preparation at multiple stages. Locally, pre-commit hooks initiate automated unit testing within Docker. In the remote environment, Jenkins automates the creation of version-tagged Docker images for each microservice upon code pushes to relevant branches, making these artifacts ready for deployment.
+    \end{itemize}
+
+    \item \textbf{Continuous Integration (CI)}
+    \begin{itemize}
+        \item \textit{Definition:} Continuous Integration (CI) is a DevOps practice involving frequent code merging by developers into a central repository, followed by automated builds and tests. Key benefits include early bug detection (like compilation errors), maintaining code in a deployable state, and encouraging modular code.
+        \item \textit{Enactment in the Pipeline:} The pipeline embodies CI through a workflow where developers frequently merge feature branches into a central \texttt{dev} branch. This triggers a sequence of automated tests: unit tests run locally before commits, and upon pushing to \texttt{dev}, Jenkins orchestrates integration tests in a dedicated Kubernetes test environment, ensuring early feedback on code stability.
+    \end{itemize}
+
+    \item \textbf{Continuous Deployment (CD)}
+    \begin{itemize}
+        \item \textit{Definition:} Continuous Deployment (CD) is the practice of automatically deploying small code changes to production in a routine and frequent manner once they have passed all automated tests. Benefits include faster time to market, a dependable deployment process, and reliable rollbacks.
+        \item \textit{Enactment in the Pipeline:} The pipeline achieves CD by automating the path to production. Successful integration and load testing on a \texttt{release} branch trigger a Jenkins workflow that automatically merges code into the \texttt{production} branch. This, in turn, initiates an automated deployment of the updated application to the live Kubernetes environment, using rolling upgrades to ensure service continuity.
+    \end{itemize}
+
+    \item \textbf{Infrastructure as Code (IaC)}
+    \begin{itemize}
+        \item \textit{Definition:} Infrastructure as Code (IaC) is the practice of managing and provisioning IT infrastructure through code and automation, rather than manual processes. This leads to consistent resource creation, reusability, self-documenting infrastructure, and simplification of complex setups.
+        \item \textit{Enactment in the Pipeline:} IaC is central to the pipeline, with Dockerfiles defining application runtime environments and Kubernetes manifests specifying the deployment infrastructure (namespaces, services, etc.). All these are version-controlled in Git. Jenkins uses these codified definitions to automate the consistent provisioning and configuration of both test and production environments within MicroK8s.
+    \end{itemize}
+
+    \item \textbf{Configuration Management}
+    \begin{itemize}
+        \item \textit{Definition:} Configuration Management involves managing and changing the state of infrastructure in constant and maintainable ways. Benefits include saving time, providing insight into infrastructure, maintainability with system changes, and minimizing configuration drift, especially in large environments.
+        \item \textit{Enactment in the Pipeline:} The pipeline manages configurations by versioning all critical definitions—Dockerfiles, Kubernetes manifests, and the Jenkinsfile—in Git. Jenkins applies these configurations consistently when creating environments. Strict controls, such as restricted direct pushes to the \texttt{production} branch and the use of distinct Kubernetes namespaces, further ensure configuration integrity and prevent drift.
+    \end{itemize}
+
+    \item \textbf{Orchestration}
+    \begin{itemize}
+        \item \textit{Definition:} Orchestration refers to the automation that supports processes and workflows, such as resource provisioning, often coordinating multiple automated tasks. It brings benefits like scalability, stability (especially with automatic responses to problem detection), and time savings.
+        \item \textit{Enactment in the Pipeline:} The entire CI/CD process is orchestrated. Jenkins, guided by the \texttt{Jenkinsfile}, manages the end-to-end workflow including builds, multi-stage testing, and deployments across different branches. Kubernetes orchestrates the runtime lifecycle of the containerized application services. Git hooks contribute by automating the initial triggers for local tests and remote pipeline execution.
+    \end{itemize}
+
+    \item \textbf{Monitoring}
+    \begin{itemize}
+        \item \textit{Definition:} Monitoring involves collecting and presenting data about the performance and stability of services and infrastructure, as well as detecting problems. Benefits include fast recovery, more data for root-cause analysis, cross-team visibility, and enabling automated responses.
+        \item \textit{Enactment in the Pipeline:} The pipeline provides operational insight through several mechanisms. Jenkins makes detailed reports from automated integration and load tests (via Newman) available for analysis. Developers can observe real-time application performance and resource utilization using the Kubernetes dashboard. The Jenkins system itself offers status updates and alerts on the health of the pipeline execution.
+    \end{itemize}
+\end{itemize}

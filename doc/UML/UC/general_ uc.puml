@@ -1,0 +1,70 @@
+@startuml
+left to right direction
+
+actor Teacher as teacher
+actor Student as student
+
+rectangle "PeerFlow" {
+  usecase "Authentication" as UC1
+  usecase "Sign up" as UC1_1
+
+  usecase "Manage assignment" as UC3
+  usecase "Define assessment rubrics" as UC3_1
+  usecase "Set assignment deadline" as UC3_2
+  usecase "Assign involved students" as UC3_3
+
+  usecase "Assign peer review" as UC4
+  usecase "Automatic assignment" as UC4_1
+  usecase "Manual assignment" as UC4_2
+
+  usecase "Monitor submissions and reviews" as UC5
+  usecase "Visualize evaluation reports" as UC6
+
+  usecase "Visualize assignments" as UC8
+  usecase "Submit work" as UC9
+  usecase "Upload text" as UC9_1
+  usecase "Upload file" as UC9_2
+
+  usecase "Visualize works to review" as UC10
+  usecase "Submit revision" as UC11
+  usecase "Provide explained scores" as UC11_1
+  usecase "Visualize assessment rubric" as UC11_2
+
+  usecase "Visualize evaluations for his work" as UC12
+}
+
+' --- Both Relationships ---
+teacher -- UC1
+student -- UC1
+UC1 <.. UC1_1 : <<extend>>
+
+' --- Teacher Relationships ---
+UC4 <|-- UC4_1
+UC4 <|-- UC4_2
+
+teacher -- UC3
+UC3 ..> UC3_1 : <<include>>
+UC3 ..> UC3_2 : <<include>>
+UC3 ..> UC3_3 : <<include>>
+
+teacher -- UC4
+
+teacher -- UC5
+teacher -- UC6
+
+
+' --- Student Relationships ---
+student -- UC8
+
+student -- UC9
+UC9 ..> UC9_1 : <<include>>
+UC9 <.. UC9_2 : <<extend>>
+
+student -- UC10
+student -- UC11
+UC11 ..> UC11_1 : <<include>>
+UC11 ..> UC11_2 : <<include>>
+
+student -- UC12
+
+@enduml

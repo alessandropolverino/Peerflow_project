@@ -1,0 +1,84 @@
+# This file is used to define the services for the testing environment.
+
+services:
+  assignment-submission-mongo-test:
+    image: mongo:8.0.9
+    container_name: assignment-submission-mongo-test
+    ports:
+      - "27024:27017"  # Different port to avoid conflicts, edit port
+    volumes:
+      - assignment-submission-data-test:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=assignment-submission-db-test
+    networks:
+      - assignment-submission-network-test-network
+    restart: unless-stopped
+
+  assignment-submission-test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: assignment-submission-test-runner
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+    env_file:
+      - .env.test
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@assignment-submission-mongo-test:27017/assignment-submission-db-test?authSource=admin
+      - NODE_ENV=test
+      - PYTHONPATH=/app
+    depends_on:
+      - assignment-submission-mongo-test
+      - fs-master-test
+      - fs-volume-test
+      - fs-filer-test
+      - fs-s3-test
+    networks:
+      - assignment-submission-network-test-network
+
+  fs-master-test:
+    image: chrislusf/seaweedfs
+    command: "master -ip=fs-master-test -ip.bind=0.0.0.0"
+    networks:
+      - assignment-submission-network-test-network
+
+  fs-volume-test:
+    image: chrislusf/seaweedfs
+    command: 'volume -mserver="fs-master-test:9333" -ip.bind=0.0.0.0'
+    depends_on:
+      - fs-master-test
+    networks:
+      - assignment-submission-network-test-network
+
+  fs-filer-test:
+    image: chrislusf/seaweedfs
+    command: 'filer -master="fs-master-test:9333" -ip.bind=0.0.0.0'
+    depends_on:
+      - fs-master-test
+      - fs-volume-test
+    networks:
+      - assignment-submission-network-test-network
+
+  fs-s3-test:
+    image: chrislusf/seaweedfs
+    ports:
+      - 8334:8333
+    command: 's3 -filer="fs-filer-test:8888" -ip.bind=0.0.0.0'
+    depends_on:
+      - fs-master-test
+      - fs-volume-test
+      - fs-filer-test
+    networks:
+      - assignment-submission-network-test-network
+
+volumes:
+  assignment-submission-data-test:
+    driver: local
+
+networks:
+  assignment-submission-network-test-network:
+    driver: bridge
+    name: assignment-submission-network-test-network

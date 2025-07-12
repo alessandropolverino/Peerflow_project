@@ -1,0 +1,116 @@
+@startuml Peer Review Submission Sequence Diagram
+
+autonumber
+actor "Student" as Student
+participant "Web Application" as WebApp
+participant "Orchestrator" as Orch
+participant "Auth & Profiling Service" as Auth
+participant "Review Assignment Service" as RevAssign
+participant "Review Assignment DB" as RevAssignDB
+participant "Assignment Submission Service" as AssignSubm
+participant "Assignment Submission DB" as AssignSubmDB
+database "File Storage DB" as FileStorageDB
+
+' 1. Student accesses assigned reviews list
+Student -> WebApp : Navigates to "Assigned Reviews" section
+activate WebApp
+WebApp -> Orch : HTTP GET /api/assigned-reviews (Bearer Token: Student's Access Token)
+activate Orch
+Orch -> Auth : verifyJWT(Access Token)
+activate Auth
+Auth --> Orch : Valid (Student ID, Role)
+deactivate Auth
+
+Orch -> RevAssign : getAssignedReviews(StudentID) (IGetAssignedReviews)
+activate RevAssign
+RevAssign -> RevAssignDB : Query submissions assigned to Student for review
+activate RevAssignDB
+RevAssignDB --> RevAssign : List of assigned submissions (IDs, status, etc.)
+deactivate RevAssignDB
+RevAssign --> Orch : List of assigned submissions
+deactivate RevAssign
+Orch --> WebApp : List of assigned submissions
+deactivate Orch
+WebApp -> Student : Displays list of assigned reviews (ID, status)
+
+' 2. Student selects a submission to review
+Student -> WebApp : Clicks on an assigned submission to review
+activate WebApp
+WebApp -> Orch : HTTP GET /api/submissions/{id}/content (Bearer Token)
+activate Orch
+Orch -> Auth : verifyJWT(Access Token)
+activate Auth
+Auth --> Orch : Valid (Student ID, Role)
+deactivate Auth
+
+' Orchestrator retrieves submission content (text + file references)
+Orch -> AssignSubm : getSubmissionContent(SubmissionID) (IGetSubmissionContent)
+activate AssignSubm
+AssignSubm -> AssignSubmDB : Query submission text and file references
+activate AssignSubmDB
+AssignSubmDB --> AssignSubm : Submission Content (Text, File Ref(s))
+deactivate AssignSubmDB
+AssignSubm --> Orch : Submission Content (Text, File Ref(s))
+deactivate AssignSubm
+
+' Orchestrator retrieves associated rubric
+Orch -> RevAssign : getRubric(AssignmentID) (IGetRubric)
+activate RevAssign
+RevAssign -> RevAssignDB : Query Rubric Details for Assignment
+activate RevAssignDB
+RevAssignDB --> RevAssign : Rubric Details (criteria, scores, descriptions)
+deactivate RevAssignDB
+RevAssign --> Orch : Rubric Details
+deactivate RevAssign
+
+Orch --> WebApp : Submission Content (Text, Attachments), Rubric Details
+deactivate Orch
+WebApp -> Student : Displays detailed review interface (submission, rubric criteria, input fields)
+
+alt If File Attachments Exist in Submission and User Wants to View Them
+  Student -> WebApp : Clicks on attachment link(s) to view/download
+  activate WebApp
+  WebApp -> Orch : HTTP GET /api/files/{fileReference} (Bearer Token)
+  activate Orch
+  Orch -> FileStorageDB : getFile(File Reference(s))
+  activate FileStorageDB
+  FileStorageDB --> Orch : Attachment Data
+  deactivate FileStorageDB
+  Orch --> WebApp : Attachment Data
+  deactivate Orch
+  WebApp -> Student : Displays or downloads attachment(s)
+end
+
+' 3. Student submits the completed review
+Student -> WebApp : Enters scores and textual justifications for each criterion (FR-REV-002)
+Student -> WebApp : Clicks "Submit Review" Button (FR-REV-002.UI)
+activate WebApp
+WebApp -> Orch : HTTP POST /api/reviews (Bearer Token, Review Data: Scores, Justifications, ReviewerID, RevieweeSubmissionID)
+activate Orch
+
+Orch -> Auth : verifyJWT(Access Token)
+activate Auth
+Auth --> Orch : Valid (Student ID, Role)
+deactivate Auth
+
+' Orchestrator sends review data to Review Assignment Service
+Orch -> RevAssign : submitReview(ReviewerID, RevieweeSubmissionID, Review Data) (ISubmitReview)
+activate RevAssign
+RevAssign -> RevAssign : Validate Review Data (scores in range, justifications)
+RevAssign -> RevAssignDB : Create New Peer Review Record
+activate RevAssignDB
+RevAssignDB --> RevAssign : Review Record Stored Confirmation
+deactivate RevAssignDB
+RevAssign -> RevAssignDB : Update Review Task Status to "Completed"
+activate RevAssignDB
+RevAssignDB --> RevAssign : Status Update Confirmation
+deactivate RevAssignDB
+RevAssign --> Orch : Review Submission Success Confirmation
+deactivate RevAssign
+
+Orch --> WebApp : Review Submission Success Message
+deactivate Orch
+WebApp -> Student : Displays Success Message / Updates Review Status in list
+deactivate WebApp
+
+@enduml

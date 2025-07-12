@@ -1,0 +1,75 @@
+\chapter{Introduction}
+\section{Purpose}
+
+\begin{justify}
+    This document defines the software requirements for the development of an automated Peer Review system, named PeerFlow. The main objective of this system is to facilitate a collaborative student evaluation process based on predefined criteria. PeerFlow will support the creation, management, and evaluation of academic assignments, providing an efficient platform for teachers and students. This document is intended for all project stakeholders, including clients, developers, testers, and project managers, to establish a clear and shared understanding of PeerFlow's functionalities and expectations.
+\end{justify}
+
+\section{Scope}
+
+\begin{justify}
+    The Peer Review system (PeerFlow) aims to support the following main functions:
+    \begin{itemize}
+        %\item Creation and management of courses by teachers.
+        %\item Enrollment and unenrollment of students in courses.
+        \item Assignment creation by teachers, including descriptions, assessment rubrics, deadlines, and involved students.
+        \item Submission of assignments by students (text plus attachments).
+        \item Peer assignment for review purposes -- may be automatic (random) or manual (defined by the teacher).
+        \item Review process where students provide motivated evaluations according to defined rubrics.
+        \item Aggregation and visualization of evaluation results for students and teachers.
+    \end{itemize}
+    %PeerFlow will not include advanced curriculum management features, payment processing, or complex integrations with unspecified external systems. The peer review process will only be possible among students enrolled in the same course to which the assignment to be reviewed belongs.
+\end{justify}
+
+\clearpage
+
+\section{Definitions, Acronyms, and Abbreviations}
+
+\begin{justify}
+\begin{itemize}
+\item \textbf{API:} Application Programming Interface. A set of rules and protocols for building and interacting with software applications.
+\item \textbf{Assignment:} Work assigned by a teacher, to be submitted and/or reviewed.
+\item \textbf{BL:} Business Logic. The part of the system that encodes the real-world business rules that determine how data can be created, stored, and changed. Referenced in requirement IDs (e.g., FR-SYS-002.BL).
+\item \textbf{CI/CD:} Continuous Integration / Continuous Delivery. Practices for automating the stages of software development, from integration to delivery.
+\item \textbf{CPU:} Central Processing Unit. The primary component of a computer that executes instructions.
+\item \textbf{Docker:} A platform for developing, shipping, and running applications in containers.
+\item \textbf{FR:} Functional Requirement. A description of a service or function that the software system must provide. Used as a prefix in requirement IDs (e.g., FR-SYS-001).
+\item \textbf{HTTP:} HyperText Transfer Protocol. The foundation of data communication for the World Wide Web.
+\item \textbf{Kubernetes:} An open-source container orchestration system for automating software deployment, scaling, and management.
+\item \textbf{LCP:} Largest Contentful Paint. A user-centric metric for measuring perceived load speed because it marks the point in the page load timeline when the page's main content has likely loaded.
+\item \textbf{MOOC:} Massive Open Online Course. An online course aimed at unlimited participation and open access via the web.
+\item \textbf{MoSCoW Prioritization:} A prioritization technique used in management, business analysis, project management, and software development to reach a common understanding with stakeholders on the importance they place on the delivery of each requirement; it stands for \textbf{M}ust have, \textbf{S}hould have, \textbf{C}ould have, and \textbf{W}on't have.
+\item \textbf{NFR:} Non-Functional Requirement. A requirement that specifies criteria that can be used to judge the operation of a system, rather than specific behaviors (e.g., performance, security).
+\item \textbf{Peer Review:} A collaborative evaluation process where students assess the work of their peers based on predefined criteria.
+\item \textbf{PeerFlow:} The name of the automated Peer Review system.
+\item \textbf{PII:} Personally Identifiable Information. Any data that could potentially identify a specific individual.
+\item \textbf{QA:} Quality Attribute. A measurable or testable property of a system that is used to indicate how well the system satisfies the needs of its stakeholders. Often used in the context of Non-Functional Requirements.
+\item \textbf{Rubric:} A set of predefined criteria used for evaluation, often including descriptions of levels of quality.
+\item \textbf{SOA:} Service-Oriented Architecture. A software design style where services are provided to the other components by application components, through a communication protocol over a network.
+\item \textbf{SRS:} Software Requirements Specification. A document that describes what a software system should do and how it should perform.
+\item \textbf{Student:} User enrolled in one or more courses, responsible for submitting assignments and reviewing peers' work.
+\item \textbf{Teacher:} User with the role of instructor, responsible for creating courses, assignments, and overseeing the review process.
+\item \textbf{TTFB:} Time To First Byte. A metric used as an indication of the responsiveness of a web server or other network resource. It measures the duration from the user or client making an HTTP request to the first byte of the page being received by the client's browser.
+\item \textbf{UI:} User Interface. The means by which the user and a computer system interact, in particular the use of input devices and software. Referenced in requirement IDs (e.g., FR-SYS-002.UI).
+\item \textbf{VM:} Virtual Machine. An emulation of a computer system. Virtual machines are based on computer architectures and provide functionality of a physical computer.
+\end{itemize}
+\end{justify}
+
+\section{References}
+
+\begin{justify}
+    \begin{itemize}
+        \item Project Assignment document.
+        \item IEEE 830-1998 Standard, "Recommended Practice for Software Requirements Specifications".
+    \end{itemize}
+\end{justify}
+
+\section{Overall System Description}
+
+\begin{justify}
+    PeerFlow will be a web platform accessible via a user interface. It will be designed to support a large and highly variable number of users, typical of MOOC environments like Coursera or Udacity. The system's architecture will be based on a Service Oriented/Microservices Architecture approach, to ensure horizontal scalability, high availability, and low latency. The main users will be teachers and students, with distinct roles and functionalities. PeerFlow will allow teachers to 
+    %create and manage courses, 
+    create assignments and evaluation rubrics, monitor the submission and review process, and access detailed evaluation reports. Students will be able to 
+    %enroll/unenroll in courses, 
+    submit their work (text and file attachments), receive assigned submissions from peers to review, complete structured reviews with motivated feedback, and view the evaluations received after the process is completed.
+\end{justify}

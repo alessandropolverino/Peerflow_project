@@ -1,0 +1,34 @@
+@startuml
+
+title Teacher Assignment Creation
+
+|Teacher|
+start
+:Navigates to "Create New Assignment";
+:     Inputs Assignment Details (Name, 
+Description, Deadline, List of Students, ecc);
+:Clicks "Create Assignment";
+
+|System|
+:Receives "Create Assignment" request;
+:Validates fields;
+if (Data is Valid?) then (yes)
+  :  Generates new 
+  assignment record;
+  :Associates assignment 
+           with Teacher;
+  :  Adds assignment to 
+  involved students' lists;
+  :Notifies involved students;
+  :   Displays success message 
+  and new assignment to Teacher;
+else (no, Invalid Data)
+  :     Displays error 
+  message to Teacher;
+endif
+
+|Teacher|
+:Views outcome (success or error);
+stop
+
+@enduml

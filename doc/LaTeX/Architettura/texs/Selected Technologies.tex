@@ -1,0 +1,126 @@
+\chapter{Selected Technologies}
+
+\begin{justify}
+This chapter details the key technologies chosen for this project, explaining the rationale behind each decision. The main driver of our decisions is a commitment to performance, scalability, availability, fast development, and long-term maintainability. The following sections will elaborate on each chosen technology, outlining its role within the architecture and the specific advantages it brings to the overall solution.
+\end{justify}
+
+\section{Backend Framework: FastAPI}
+
+\begin{justify}
+FastAPI is a modern, high-performance web framework for building APIs with Python based on standard Python type hints. In PeerFlow, FastAPI is used to develop the REST APIs for each of the backend microservices.
+\end{justify}
+
+\subsection{Key Advantages}
+
+\begin{itemize}
+\item \textbf{High Performance:} FastAPI is built on top of Starlette, a lightweight ASGI framework for building async web services, and Pydantic, a fast and extensible data validation library, making it one of the fastest Python frameworks available, on par with NodeJS and Go. This is crucial for handling a large and variable number of users in a MOOC environment. FastAPI is also based on the OpenAPI standard for API creation, focused on understandability from both human and machine without requiring direct access to the source code or additional documentation.
+\item \textbf{Fast to Code:} It is designed to be easy to use and learn, with great editor support and autocompletion, significantly increasing development speed. Features like type hints reduce human-induced errors, reducing debuggin time. This supports the project's need for rapid development.
+\item \textbf{Automatic Data Validation and Serialization:} Leveraging Pydantic, FastAPI provides automatic request data validation, serialization, and deserialization, ensuring data integrity.
+\item \textbf{Automatic API Documentation:} It automatically generates interactive API documentation starting from OpenAPI definitions, using Swagger UI for interactive exploration of the interfaces, and ReDoc for a more detailed and structured presentation, which is invaluable for a microservices architecture where multiple services interact.
+\end{itemize}
+
+\begin{justify}
+FastAPI was chosen due to its excellent performance characteristics, which are essential for a system designed for MOOC environments with potentially high user loads. Its support for rapid development and automatic data validation aligns with the project's need to efficiently build and maintain multiple robust microservices. The auto-generated documentation also aids in managing the complexity of inter-service communication and improving the understandability of the system.
+\end{justify}
+
+\section{Frontend Framework: Vue.js}
+
+\begin{justify}
+Vue.js is a progressive JavaScript framework for building user interfaces. It is built on top of HTML, CSS and JavaScript and provides a declarative, component-based programming model to develop UIs of any complexity. In the PeerFlow project, Vue.js is utilized to create the client-side Web Application, providing an interface for both Students and Teachers to interact with the system's functionalities.
+\end{justify}
+
+\subsection{Key Advantages}
+
+\begin{itemize}
+\item \textbf{Approachable and Easy to Integrate:} Being based on HTML, CSS and JavaScript, Vue.js is easy to learn for developers familiar with classic frontend development. It also provides and extensive documentation.
+\item \textbf{Component-Based Architecture:} Its component-based programming model, leads to a frontend code that is more modular, maintainable, and scalable. This aligns with the microservices architecture of the backend.
+\item \textbf{Performance:} Vue.js is known for its good performance, due to its reactive and compiler-optimized rendering system.
+\item \textbf{Rich Ecosystem:} It has a comprehensive ecosystem of libraries and tools, facilitating the development of web applications of various form and scale.
+\end{itemize}
+
+\begin{justify}
+Vue.js was selected to develop the User Interface (UI) for PeerFlow mainly because of its component-based architecture, whose modularity is a good fit for interacting with a microservices backend, and for its performance and ease of use. These advantages contribute to the overall goal of creating an efficient and user-friendly platform.
+\end{justify}
+
+\section{DBMS: MongoDB}
+
+\begin{justify}
+MongoDB is document-based DBMS, classified as a NoSQL database. In PeerFlow, MongoDB is specifically used as the dedicated database for the Review Processing Service to store aggregated review results.
+\end{justify}
+
+\subsection{Key Advantages}
+
+\begin{itemize}
+\item \textbf{Flexible Schema:} Document-based storage allows for flexible and evolving data structures, which is ideal for storing data associated to continously evolving microservices.
+\item \textbf{Scalability:} MongoDB is designed for horizontal scalability, allowing it to handle large volumes of data and high throughput, which is beneficial for MOOC-scale applications.
+\item \textbf{Rich Query Language:} It provides a powerful query language for accessing and analyzing data stored in documents. This is beneficial for generating reports and visualizations.
+\item \textbf{Performance for Specific Use Cases:} For read-heavy analytical workloads on denormalized data, MongoDB can offer high performance.
+\end{itemize}
+
+\begin{justify}
+MongoDB was chosen for the DB of the microservices mainly due to its high horizontal scalability, necessary to handle the high number of requests in a MOOC environment, and its suitability for storing and querying for aggregated results, such as overall assignment statistics and detailed reports. Its schema flexibility is also useful to seamlessly integrate new functionalities for both students and teachers.
+\end{justify}
+
+\section{File storage system: SeaweedFS}
+
+\begin{justify}
+SeaweedFS is an open-source distributed object store and file system designed for efficiently handling a large number of files of any dimension. In PeerFlow, SeaweedFS acts as the File Storage Service, managing all file attachments submitted by students for their assignments.
+\end{justify}
+
+\subsection{Key Advantages}
+
+\begin{itemize}
+\item \textbf{Efficient Handling of Many Files:} Optimized for storing and serving billions of files quickly.
+\item \textbf{Scalability and High Availability:} It can be easily scaled out to accommodate growing storage needs and provide high availability.
+\item \textbf{Lower Overhead:} Compared to traditional distributed file systems, it often has lower per-file overhead, making it cost-effective for large quantities of files.
+\item \textbf{REST API:} Provides a simple HTTP REST API for file operations, making it easy to integrate with other defined microservices like the Orchestrator or Assignment Submission Service.
+\end{itemize}
+
+\begin{justify}
+SeaweedFS was selected to manage student file submissions in a scalable and efficient manner. This is crucial for handling potential submission peaks \req{QA-PE-3} and offloading the Assignment Submission Service by allowing the Orchestrator to interact directly with the file storage for uploads. This design contributes to the overall performance and robustness of the submission process.
+\end{justify}
+
+\section{Virtualization: Docker and Kubernetes}
+
+\begin{justify}
+Docker is a containerization platform used for developing, shipping, and running applications by packaging them into units called containers. Kubernetes is an open-source container orchestration tool designed to automate the deployment, scaling, and management of these containerized applications. In PeerFlow, Docker is employed to containerize each microservice and their respective databases (DBs), ensuring consistent environments across development, testing, and production stages. Kubernetes is then utilized to orchestrate these containerized components within a cluster, managing their deployment, scaling to meet user demand, and ensuring high availability. Each microservice is allocated to a Kubernetes pod, which in turn manages the replicas of its microservice.
+\end{justify}
+
+\subsection{Key Advantages}
+
+\begin{itemize}
+    \item \textbf{Consistent Environments (Docker):} Containers encapsulate an application and its dependencies, ensuring that it runs identically and reliably regardless of the underlying infrastructure.
+    \item \textbf{Isolation (Docker):} Docker ensures that microservices run in isolated environments. This isolation reduces inter-service conflicts, and improves modifiability by allowing changes within one service with minimal impact on others (supporting scenarios like \req{QA-MO-01} and \req{QA-MO-2}). This also aligns with the microservices principle of independent deployment.
+    \item \textbf{Horizontal Scaling and High Availability (Kubernetes):} Kubernetes can automatically scale service instances horizontally based on demand, critical for supporting a large and variable number of users typical of MOOC environments. It also provides a self-healing capability by comparing the desided state (e.g. the number of replicas, specified by the developer) to the current state and acting upon detected differences (as per \req{QA-AV-1}). Moreover Kubernetes can scale service instances based on resource consumption like the Assignment Service during submission peaks (\req{QA-PE-3}), and balance the load between replicas.
+    \item \textbf{Automated Deployment and Management (Kubernetes):} Kubernetes automates complex tasks such as application rollouts and rollbacks, which is essential for maintaining system stability and supports deployability requirements like deploying bug fixes with zero downtime (\req{QA-DE-1}) or rolling back malfunctioning services (\req{QA-DE-2}). It also provides service discovery, for instance, by leveraging health check endpoints for automated monitoring within the cluster (\req{QA-IN-2}).
+\end{itemize}
+
+\begin{justify}
+Docker and Kubernetes are pratically necessary technologies to satisfy the system's requirements of high availability and scalability, dictated by the necessities of a MOOC environment, which includes traffic spikes and rapid user growth. Docker and Kubernetes directly support several key non-functional requirements: 
+\begin{itemize}
+    \item Modifiability, by ensuring services are isolated and can be updated independently.
+    \item Deployability, by facilitating automated CI/CD pipelines and enabling scenarios such as deploying a bug fix to a specific service (\req{QA-DE-1}) and rolling back a malfunctioning service (\req{QA-DE-2}) efficiently.
+    \item Availability, by managing service instance failures and ensuring continuous operation (\req{QA-AV-1}).
+\end{itemize}
+The entire PeerFlow system, including its web application, orchestrator, microservices, and their databases, is designed to be deployed within this Kubernetes cluster environment.
+\end{justify}
+
+\section{Testing: Pytest, Postman and Newman}
+
+\begin{justify}
+Pytest is a Python testing framework that allows writing simple, scalable test cases. Postman is a collaboration platform for API development, often used for designing, building, testing, and documenting APIs. Newman is a command-line Collection Runner for Postman, enabling the automation of API tests. These tools are used in PeerFlow to implement automated testing.
+\end{justify}
+
+\subsection{Key Advantages}
+
+\begin{itemize}
+\item \textbf{Comprehensive Testing (Pytest):} Enables robust unit and integration testing for Python-based backend services.
+\item \textbf{API Design and Manual Testing (Postman):} Provides an intuitive GUI for designing, debugging, and manually testing REST APIs.
+\item \textbf{Automated API Testing (Newman):} Allows Postman collections to be run from the command line, facilitating integration into CI/CD pipelines for automated API end-to-end or integration testing.
+\item \textbf{Improved Software Quality:} Collectively, these tools help ensure the reliability and correctness of individual services and their interactions within the microservices architecture.
+\end{itemize}
+
+\begin{justify}
+Pytest, Postman, and Newman were chosen to design, implement and automate tests. Pytest supports backend unit tests for the Python-based microservices. Postman is used to define integration and load tests of entire system. Automating these tests via Newman in a CI/CD pipeline ensures continuous quality assurance.
+\end{justify}
+

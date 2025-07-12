@@ -1,0 +1,51 @@
+# This file is used to define the services for the testing environment.
+
+# this template contains following placeholders to edit:
+# processing: Name of the service (e.g., "auth")
+# processing-service-mongo: Name of the MongoDB volume (e.g., "auth-mongo-volume")
+# processing-service-db: Name of the database (e.g., "auth-db")
+# rocessing-network: Name of the network (e.g., "auth-network")
+
+services:
+  processing-mongo-test:
+    image: mongo:8.0.9
+    container_name: processing-mongo-test
+    ports:
+      - "27028:27017"  # Different port to avoid conflicts, edit port
+    volumes:
+      - processing-service-mongo-test:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=processing-service-db-test
+    networks:
+      - rocessing-network-test-network
+    restart: unless-stopped
+
+  processing-test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: processing-test-runner
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+    env_file:
+      - .env.test
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@processing-mongo-test:27017/processing-service-db-test?authSource=admin
+      - NODE_ENV=test
+      - PYTHONPATH=/app
+    depends_on:
+      - processing-mongo-test
+    networks:
+      - rocessing-network-test-network
+
+volumes:
+  processing-service-mongo-test:
+    driver: local
+
+networks:
+  rocessing-network-test-network:
+    driver: bridge
+    name: rocessing-network-test-network

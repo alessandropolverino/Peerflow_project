@@ -1,0 +1,113 @@
+# This file is used to define the services for the development environment.
+services:
+  fs-master:
+    image: chrislusf/seaweedfs 
+    ports:
+      - 9333:9333
+      - 19333:19333
+      - 9324:9324
+    command: "master -ip=fs-master -ip.bind=0.0.0.0 -metricsPort=9324 -mdir=./mdata"
+    networks:
+      - assignment-submission-network
+    volumes:
+      - assignment-submission-fs-master-data:/mdata
+  fs-volume:
+    image: chrislusf/seaweedfs 
+    ports:
+      - 8079:8080
+      - 18080:18080
+      - 9325:9325
+    command: 'volume -mserver="fs-master:9333" -ip.bind=0.0.0.0 -port=8079  -metricsPort=9325 -dir=/data'
+    depends_on:
+      - fs-master
+    volumes:
+      - assignment-submission-fs-volume-data:/data
+    networks:
+      - assignment-submission-network
+  fs-filer:
+    image: chrislusf/seaweedfs 
+    ports:
+      - 8888:8888
+      - 18888:18888
+      - 9326:9326
+    command: 'filer -master="fs-master:9333" -ip.bind=0.0.0.0 -metricsPort=9326'
+    volumes:
+      - assignment-submission-fs-filer-data:/data
+    tty: true
+    stdin_open: true
+    depends_on:
+      - fs-master
+      - fs-volume
+    networks:
+      - assignment-submission-network
+  fs-s3:
+    image: chrislusf/seaweedfs
+    container_name: fs-s3 # needed for network access
+    ports:
+      - 8333:8333
+      - 9327:9327
+    command: 's3 -filer="fs-filer:8888" -ip.bind=0.0.0.0 -metricsPort=9327 -config=/etc/seaweedfs/s3.json'
+    volumes:
+      - ./config/s3.json:/etc/seaweedfs/s3.json:ro
+    depends_on:
+      - fs-master
+      - fs-volume
+      - fs-filer
+    networks:
+      - assignment-submission-network
+
+  assignment-submission-mongo:
+    image: mongo:8.0.9
+    container_name: assignment-submission-mongo
+    ports:
+      - "27023:27017" 
+    volumes:
+      - assignment-submission-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=assignment-submission-db
+    networks:
+      - assignment-submission-network
+    restart: unless-stopped
+  assignment-submission-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: assignment-submission-service
+    ports:
+      - "3003:3000"
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@assignment-submission-mongo:27017/assignment-submission-db?authSource=admin
+      - NODE_ENV=development
+      - S3_ENDPOINT_URL=http://fs-s3:8333
+    depends_on:
+      - assignment-submission-mongo
+      - fs-master
+      - fs-volume
+      - fs-filer
+      - fs-s3
+    networks:
+      - assignment-submission-network
+    restart: unless-stopped
+
+
+volumes:
+  assignment-submission-data:
+    driver: local
+  assignment-submission-fs-master-data:
+    driver: local
+  assignment-submission-fs-volume-data:
+    driver: local
+  assignment-submission-fs-filer-data:
+    driver: local
+
+networks:
+  assignment-submission-network:
+    driver: bridge
+    name: assignment-submission-network
+  

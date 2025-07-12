@@ -1,0 +1,68 @@
+@startuml Assignment Creation Sequence Diagram
+autonumber
+actor "Teacher" as Teacher
+participant "Web Application" as WebApp
+participant "Orchestrator" as Orch
+participant "Auth & Profiling Service" as Auth
+participant "Auth DB" as AuthDB
+participant "Assignment Service" as Assign
+participant "Assignment DB" as AssignDB
+participant "Notification Service" as Notif
+participant "Involved Students" as Students
+
+Teacher -> WebApp : Navigates to "Create Assignment" Page
+activate WebApp
+
+' Step 1: WebApp requests student list
+WebApp -> Orch : HTTP GET [Bearer Token: Teacher's Access Token]
+
+note right of Orch
+  Assuming the Access Token is valid, otherwise 
+  the request would fail with an error.
+end note
+
+activate Orch
+Orch -> Orch : verifyJWT(Access Token)
+
+
+Orch -> Auth : getStudents()
+activate Auth
+Auth -> AuthDB : Query All Students
+activate AuthDB
+AuthDB --> Auth : List of Student IDs & Names
+deactivate AuthDB
+Auth --> Orch : List of Student IDs & Names
+deactivate Auth
+Orch --> WebApp : List of Student IDs & Names
+deactivate Orch
+
+WebApp -> Teacher : Displays Assignment Creation Form (with student selection)
+Teacher -> WebApp : Enters Assignment Details (name, description, deadline) and Selects Involved Students
+Teacher -> WebApp : Clicks "Create Assignment" Button
+
+' Step 2: WebApp submits assignment details
+WebApp -> Orch : HTTP POST (Assignment Details, Selected Student IDs)
+activate Orch
+Orch -> Orch : verifyJWT(Access Token)
+
+Orch -> Assign : createAssignment(TeacherID, Details, Selected Student IDs)
+activate Assign
+Assign -> Assign : Validate Assignment Details (e.g., deadline in future) (FR-ASG-002.BL)
+Assign -> AssignDB : Create New Assignment Record (FR-ASG-002.BL)
+activate AssignDB
+AssignDB --> Assign : Assignment Creation Confirmation
+deactivate AssignDB
+Assign --> Orch : Assignment Creation Success Confirmation
+deactivate Assign
+
+Orch -> Notif : sendNotification(Assignment Details, Involved Student IDs) (FR-ASG-005)
+activate Notif
+Notif -> Students : Email Notification (New Assignment)
+deactivate Notif
+
+Orch --> WebApp : Assignment Creation Success Message
+deactivate Orch
+WebApp -> Teacher : Displays Success Message / Redirects to Assignment List (FR-ASG-001.UI)
+deactivate WebApp
+
+@enduml

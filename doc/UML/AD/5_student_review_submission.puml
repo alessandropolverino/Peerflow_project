@@ -1,0 +1,56 @@
+@startuml
+title Student Peer Review Submission
+
+|Student (Reviewer)|
+start
+:Accesses list of submissions 
+      assigned for review;
+:Selects a specific submission to review;
+
+|System|
+: Receives request for 
+submission to review;
+:Retrieves submission content;
+:Retrieves associated evaluation rubric;
+:Displays submission content
+      and rubric to Student;
+
+|Student (Reviewer)|
+:Views submission content and rubric;
+:Initiates review input process;
+repeat
+  :Selects a rubric criterion;
+  :Provides score (within defined range) for criterion;
+  :Provides textual justification for the score;
+repeat while (More criteria to review?) is (yes)
+-> All criteria reviewed;
+:Clicks "Submit Review";
+
+|System|
+:Receives "Submit Review" request;
+:Validates all rubric criteria are addressed;
+:Validates scores are within range 
+      and justifications provided;
+if (Review is Valid?) then (no, Invalid Review)
+  |System|
+  :Displays validation 
+      error message;
+  |Student (Reviewer)|
+  :Sees error message;
+  stop
+else (yes)
+  |System|
+  :Creates new peer review record;
+  :     Updates status of this 
+  review task to "Completed" 
+            for the student;
+  :Displays success message 
+  and updates review status 
+            in list to Student;
+  |Student (Reviewer)|
+  :Sees success message 
+     and updated status;
+  stop
+endif
+
+@enduml

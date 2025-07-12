@@ -1,0 +1,85 @@
+@startuml Review Processing Component and Connector diagram
+
+
+package "PeerFlow Client" {
+  component "Web Application" as WebApp
+}
+
+
+' External consumption of aggregated results (e.g., by Orchestrator for UI)
+component "Orchestrator" as Orch
+interface "IAPIGateway" as IAPIG
+interface "IGetAggregatedResultsAPI" as IGetAggregatedResultsAPI
+Orch -up- IAPIG
+Orch -up- IGetAggregatedResultsAPI
+
+
+WebApp -down-> IAPIG : HTTP POST /api/assignments/{id}/start-review-aggregation
+
+
+package "PeerFlow Microservices" {
+  component "Review Assignment Service" as RevAssign
+  ' To extract raw review data
+  interface "IGetCompletedReviews" as IGetCompletedReviews 
+  ' To get rubric for context
+  interface "IGetRubric" as IGetRubric 
+  ' To get pairings for assigned counts
+  interface "IGetReviewAssignments" as IGetReviewAssignments 
+  ' Review Assignment Service provides its interfaces
+  RevAssign -up- IGetCompletedReviews
+  RevAssign -up- IGetRubric
+  RevAssign -up- IGetReviewAssignments
+
+
+  component "Review Processing Service" as RevProc
+  ' Triggered by assignment completion
+  ' For external services to query results
+  interface "IGetAggregatedResults" as IGetAggregatedResults
+  interface "IStartReviewAggregationAPI" as IStartReviewAggregationAPI
+
+  ' Review Processing Service provides its interfaces
+  RevProc -up- IGetAggregatedResults
+  RevProc -up- IStartReviewAggregationAPI
+
+  component "Assignment Service" as Assign
+  ' To check and update assignment status
+  interface "IAssignmentStatus" as IAssignStatus 
+  ' Assignment Service provides its interface
+  Assign -up- IAssignStatus
+
+
+  component "Other Services" as OtherServices
+  interface "IOtherServicesAPI" as IOtherAPI
+  OtherServices -up- IOtherAPI
+}
+
+package "Data Layer" {
+  database "Review Assignment DB" as RevAssignDB
+  database "Review Processing DB (MongoDB)" as RevProcDB
+  database "Assignment DB" as AssignDB
+}
+
+' -----------------------------------------------
+' START REVIEW AGGREGATION FLOW
+' -----------------------------------------------
+
+' Orch gets data from Review Assignment Service
+Orch -down-> IGetCompletedReviews : getCompletedReviews(AssignmentID)
+Orch -down-> IGetRubric : getRubric(AssignmentID)
+Orch -down-> IGetReviewAssignments : getReviewAssignments(AssignmentID)
+RevAssign -down-> RevAssignDB : Read Raw Reviews\nRead Rubrics\nRead Review Assignments
+
+
+' Orch triggers Review Processing Service to start aggregation
+Orch -down-> IStartReviewAggregationAPI : startReviewAggregation(Review Data)
+
+
+' After calculations, Review Processing Service loads aggregated data into its own DB
+RevProc -down-> RevProcDB : Write AggregatedByAssignmentResult\nWrite AggregatedByStudentResult\nWrite AggregatedByReviewerResult
+
+
+' Then, it updates the status of the assignment in the Assignment Service
+Orch -down-> IAssignStatus : updateAssignmentStatus(AssignmentID, Status)
+Assign -down-> AssignDB : Update Assignment Status
+
+@enduml

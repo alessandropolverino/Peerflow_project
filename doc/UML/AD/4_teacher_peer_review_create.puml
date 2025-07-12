@@ -1,0 +1,94 @@
+@startuml
+title Teacher: Rubric Creation & Peer Review Phase Setup 
+
+|Teacher|
+start
+:Accesses an assignment's detail page;
+
+if ( Submission deadline 
+passed AND no rubric 
+          finalized?) then (no, cannot create rubric)
+  |Teacher|
+  :     Sees rubric creation 
+  is not available/applicable;
+  stop
+else (yes, can create rubric)
+  :Clicks "Define Rubric";
+  :Defines one or more 
+    evaluation criteria;
+  :Clicks "Save Rubric";
+
+  |System|
+  :Receives rubric creation request;
+  :Verifies submission 
+     deadline passed;
+  :Verifies no rubric already finalized;
+  :Validates submitted 
+        rubric data;
+  if (Rubric Data is Valid?) then (yes)
+    :Creates new rubric record;
+    :  Associates rubric 
+    with the assignment;
+    :    Displays success 
+    message and defined 
+        rubric to Teacher;
+  else (no, Invalid Rubric Data)
+    :     Displays error 
+    message to Teacher;
+  endif
+endif
+
+|Teacher|
+:Views outcome of rubric creation;
+
+if ( Submissions closed 
+AND rubric finalized?) then (no, cannot setup 
+    peer review)
+  |Teacher|
+  :   Sees peer review 
+  setup is not available;
+  stop
+else (yes, can setup peer review)
+  :Clicks "Setup Peer Review";
+  :Confirms/views finalized rubric;
+  :       Inputs "Number of 
+  Reviewers per Submission";
+  : Selects "Reviewer 
+   Assignment Mode" 
+  (Automatic/Manual);
+  if (Manual Mode Selected?) then (yes)
+    :Manually assigns specified 
+      number of reviewers to 
+            each submission;
+  else (no, Automatic Mode)
+  endif
+  :Clicks "Start Peer Review";
+
+  |System|
+  :Receives peer review 
+        setup request;
+  :Validates configuration 
+            parameters;
+  if (Configuration is Valid?) then (yes)
+    : Assigns peer reviewers 
+    to submissions (ensuring
+            no self-review);
+    :Creates peer review pairing records;
+    :Updates assignment status 
+    to "Peer Review in Progress";
+    :Makes assigned submissions & 
+      rubric available to reviewers;
+    :  Notifies students
+       about their peer 
+    review assignments;
+    :Displays success message;
+  else (no, Invalid Configuration)
+    :Displays error message;
+  endif
+endif
+
+|Teacher|
+:Views outcome of peer review setup;
+stop
+
+@enduml

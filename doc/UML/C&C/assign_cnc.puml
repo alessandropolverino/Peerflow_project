@@ -1,0 +1,63 @@
+@startuml Assignment Creation Component and Connector diagram
+
+
+package "PeerFlow Client" {
+  component "Web Application" as WebApp
+}
+
+component "Orchestrator" as Orch
+interface "IAPIGateway" as IAPIG
+' Orchestrator provides API Gateway interface
+Orch -up- IAPIG
+
+package "PeerFlow Microservices" {
+  component "Auth & Profiling Service" as Auth 
+  interface "IUsers" as IUsers
+  ' Auth Service provides student retrieval interface
+  Auth -up- IUsers
+
+
+  component "Assignment Service" as Assign
+  interface "IAssignment" as IAssignment
+  ' Assignment Service provides its interfaces
+  Assign -down- IAssignment
+  
+
+  component "Notification Service" as Notif
+  interface "INotification" as INotif
+  ' Notification Service provides its interface
+  Notif -down- INotif
+  
+
+  component "Other Services" as OtherServices
+  interface "IOtherServicesAPI" as IOtherAPI
+}
+
+package "Data Layer" {
+  database "Assignment DB" as AssignDB
+  database "Auth DB" as AuthDB
+}
+
+' WebApp uses Orchestrator as API Gateway
+WebApp -down-> IAPIG : HTTP POST \nHTTP GET
+
+
+' Orchestrator uses Assignment Service for creation
+Orch -down-> IAssignment : createAssignment()
+
+' Orchestrator uses Notification Service
+Orch -down-> INotif : sendNotification()
+
+' Orchestrator retrieves student data from Auth Service
+Orch -down-> IUsers : getStudents()
+
+
+' Other Services provides its API interface (not directly involved in this flow, but good to show context)
+OtherServices -up- IOtherAPI
+
+' Interactions with DBs
+Assign -down-> AssignDB : Create/Update Assignment Record
+Auth -down-> AuthDB : Read/Write User Data
+
+"PeerFlow Microservices" -[hidden]down- "Data Layer"
+@enduml

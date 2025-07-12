@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# pre-push hook
+# Prevents direct pushes to the 'production' branch.
+#
+# Installation:
+#   1. Save this file as '.git/hooks/pre-push' in your local repository.
+#   2. Make the file executable: 'chmod +x .git/hooks/pre-push'
+
+# --- CONFIGURATION ---
+# Define the protected branch
+PROTECTED_BRANCH="production"
+
+# --- HOOK LOGIC ---
+
+# Read each ref being pushed
+while read local_ref local_sha remote_ref remote_sha; do
+    # Extract the remote branch name from remote_ref 
+    branch=$(echo "$remote_ref" | sed 's/refs\/heads\///')
+
+    # Skip pushes of tags or non-HEAD branches
+    if [[ "$remote_ref" != refs/heads/* ]]; then
+        continue
+    fi
+    
+    # Check if the branch being pushed is the protected branch
+    if [ "$branch" = "$PROTECTED_BRANCH" ]; then
+        echo " "
+        echo "==================================================================="
+        echo "❌ ERROR: Direct push to the '$PROTECTED_BRANCH' branch is not allowed!"
+        echo " "
+        echo "   Reason: This branch is protected. Changes must go through"
+        echo "           the Continuous Integration pipeline."
+        echo " "
+        echo "   Solution: Please push only on "dev" or "release" branches"
+        echo "             via your CI/CD system."
+        echo " "
+        echo "==================================================================="
+        echo " "
+        # Block the push operation
+        exit 1 
+    fi
+done
+
+# Allow the push operation if no protected branch was detected
+exit 0 

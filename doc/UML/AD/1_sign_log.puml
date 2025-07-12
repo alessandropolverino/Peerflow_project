@@ -1,0 +1,55 @@
+@startuml
+title Student/Teacher Registration and Login
+
+|User|
+start
+:Accesses PeerFlow System;
+if (Wants to Register?) then (yes)
+    :Chooses "Sign Up";
+    :Selects Role (Student/Teacher);
+    :Enters Name, Surname, 
+          Email, Password;
+    :Clicks "Confirm Sign Up";
+else (no, Login)
+    :Chooses "Login" (or default);
+    :Enters Email and Password;
+    :Clicks "Login";
+endif
+
+|System|
+if (Registration Attempt?) then (yes)
+    :Validates submitted data;
+    if (Email unique and 
+      data valid?) then (yes)
+        :Registers new 
+                user;
+        :Displays success 
+              message;
+    else (no)
+        :Displays error 
+            message;
+    endif
+else (no, Login Attempt)
+    :Validates credentials;
+    if (Credentials valid?) then (yes)
+        :Identifies user role;
+        :Grants access to role-
+        specific functionalities;
+        :  Displays appropriate 
+        dashboard/landing page;
+    else (no)
+        :Displays error 
+            message;
+    endif
+endif
+
+|User|
+if (Successful Action?) then (yes)
+    :    Proceeds with 
+    authenticated session;
+else (no)
+    :May retry or abandon;
+endif
+stop
+
+@enduml

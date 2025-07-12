@@ -1,0 +1,66 @@
+@startuml
+title Teacher: Submission/Review Monitoring & Result Viewing
+
+|Teacher|
+start
+:Accesses an assignment's detail page;
+
+if (          Assignment Status is 
+"assigned" OR "preparing review"?) then (no)
+:Start the peer review;
+else (yes - Monitor Submissions)
+  |System|
+  :Retrieves submission statistics;
+  :   Displays total assigned students, 
+  number submitted, list of submissions;
+  |Teacher|
+  :Views submission monitoring data;
+  stop
+endif
+
+if (Assignment Status is 
+    "Under Review"?) then (no)
+  :Peer review end;
+else (yes - Monitor Reviews)
+  |System|
+  :Retrieves peer review 
+      progress statistics;
+  :Displays total expected reviews, 
+  completed reviews, submissions 
+          needing review, etc.;
+  :Displays list of reviewers;
+  |Teacher|
+  :Views peer review 
+    monitoring data;
+  stop
+endif
+
+:Assignment Status is "Completed"?;
+|Teacher|
+:Chooses to access peer review 
+    results for the assignment;
+
+|System|
+:Receives request for final results;
+:Aggregates evaluation results;
+:     Displays overall 
+assignment statistics;
+:Displays list of all student submissions;
+
+|Teacher|
+:Views overall assignment results;
+if (Wants to view detailed report 
+   for a specific submission?) then (yes)
+  : Selects an individual student's 
+  submission for a detailed report;
+  |System|
+  :Receives request for detailed submission report;
+  :Retrieves original submission content;
+  :Retrieves all peer reviews for that submission;
+  :Displays original submission + all its peer reviews;
+  |Teacher|
+  :Views detailed submission report;
+else (no)
+endif
+stop
+@enduml

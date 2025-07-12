@@ -1,0 +1,1146 @@
+{
+	"info": {
+		"_postman_id": "eb8960b9-2e94-4330-8255-1c0ccfb1a23b",
+		"name": "PeerFlow Orchestrator API Tests",
+		"description": "Newman tests for Orchestrator service routes with authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "14944441",
+		"_collection_link": "https://bold-satellite-659477.postman.co/workspace/My-Workspace~f654b30d-50c1-4938-8984-3421ff707add/collection/14944441-eb8960b9-2e94-4330-8255-1c0ccfb1a23b?action=share&source=collection_link&creator=14944441"
+	},
+	"item": [
+		{
+			"name": "Setup - Create Student Account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// GEN RANDOM MAIL FOR STUDENT\r",
+							"const randomMail = Math.random().toString(36).substring(2, 15) + '@test.com';\r",
+							"\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"requestBody.email = randomMail;\r",
+							"pm.request.body.raw = JSON.stringify(requestBody);\r",
+							"pm.collectionVariables.set('student_mail', randomMail);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student account created successfully', function () {",
+							"    pm.response.to.have.status(201);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('user');",
+							"    pm.collectionVariables.set('student_id', responseJson.user.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"password\": \"password123\",\n  \"role\": \"Student\",\n  \"name\": \"Test\",\n  \"surname\": \"Student\"\n}"
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/signup",
+					"host": [
+						"{{auth_service_url}}"
+					],
+					"path": [
+						"authentication",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Setup - Create Student2 Account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// GEN RANDOM MAIL FOR STUDENT\r",
+							"const randomMail = Math.random().toString(36).substring(2, 15) + '@test.com';\r",
+							"\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"requestBody.email = randomMail;\r",
+							"pm.request.body.raw = JSON.stringify(requestBody);\r",
+							"pm.collectionVariables.set('student2_mail', randomMail);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student account created successfully', function () {",
+							"    pm.response.to.have.status(201);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('user');",
+							"    pm.collectionVariables.set('student2_id', responseJson.user.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"password\": \"password123\",\n  \"role\": \"Student\",\n  \"name\": \"Test\",\n  \"surname\": \"Student2\"\n}"
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/signup",
+					"host": [
+						"{{auth_service_url}}"
+					],
+					"path": [
+						"authentication",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Setup - Create Teacher Account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// GEN RANDOM MAIL FOR TEACHER\r",
+							"const randomMail = Math.random().toString(36).substring(2, 15) + '@test.com';\r",
+							"\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"requestBody.email = randomMail;\r",
+							"pm.request.body.raw = JSON.stringify(requestBody);\r",
+							"pm.collectionVariables.set('teacher_mail', randomMail);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Teacher account created successfully', function () {",
+							"    pm.response.to.have.status(201);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('user');",
+							"    pm.collectionVariables.set('teacher_id', responseJson.user.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"password\": \"password123\",\n  \"role\": \"Teacher\",\n  \"name\": \"Test\",\n  \"surname\": \"Teacher\"\n}"
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/signup",
+					"host": [
+						"{{auth_service_url}}"
+					],
+					"path": [
+						"authentication",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Setup - Login Student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student login successful', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('access_token');",
+							"    pm.collectionVariables.set('student_token', responseJson.access_token);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{student_mail}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/login",
+					"host": [
+						"{{auth_service_url}}"
+					],
+					"path": [
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Setup - Login Student2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student login successful', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('access_token');",
+							"    pm.collectionVariables.set('student2_token', responseJson.access_token);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{student2_mail}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/login",
+					"host": [
+						"{{auth_service_url}}"
+					],
+					"path": [
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Setup - Login Teacher",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Teacher login successful', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('access_token');",
+							"    pm.collectionVariables.set('teacher_token', responseJson.access_token);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{teacher_mail}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/login",
+					"host": [
+						"{{auth_service_url}}"
+					],
+					"path": [
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Student Assignments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student assignments retrieved successfully', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('assignments');",
+							"    pm.expect(responseJson.assignments).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{student_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Assignment (Teacher)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Assignment created successfully', function () {",
+							"    pm.response.to.have.status(201);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('assignment');",
+							"    pm.collectionVariables.set('assignment_id', responseJson.assignment.id);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"const today = new Date();\r",
+							"const submissionDeadlineDate = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days in milliseconds\r",
+							"const submissionDeadlineISO = submissionDeadlineDate.toISOString();\r",
+							"\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"requestBody.submissonDeadline = submissionDeadlineISO;\r",
+							"pm.request.body.raw = JSON.stringify(requestBody);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Test Assignment\",\n  \"description\": \"This is a test assignment for Newman testing\",\n  \"involvedStudentIds\": [\"{{student_id}}\", \"{{student2_id}}\"]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assignment Details (Student)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Assignment details retrieved successfully', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('assignment');",
+							"    pm.expect(responseJson.assignment).to.have.property('id', pm.collectionVariables.get('assignment_id'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{student_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assignment Details (Teacher)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Assignment details retrieved successfully for teacher', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('assignment');",
+							"    pm.expect(responseJson).to.have.property('peerReviewAssignment');",
+							"    pm.expect(responseJson).to.have.property('submissions');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Assignment (Student)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Assignment submitted successfully', function () {",
+							"    pm.response.to.have.status(201);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('submission');",
+							"    if (responseJson.submission && responseJson.submission.id) {",
+							"        pm.collectionVariables.set('submission_id', responseJson.submission.id);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{student_token}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "text_content",
+							"value": "This is my assignment submission for testing purposes.",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/submit",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"submit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Student Submission",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student submission retrieved successfully', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('submission');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{student_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/submission",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"submission"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assignment Submissions (Teacher)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Assignment submissions retrieved successfully', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('message');",
+							"    pm.expect(responseJson).to.have.property('submissions');",
+							"    pm.expect(responseJson.submissions).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/submissions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"submissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Peer Review Assignment (Student)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Peer review assignment request handled', function () {",
+							"    // This might return 404 if no peer review is set up, which is acceptable",
+							"    pm.expect([200, 404]).to.include(pm.response.code);",
+							"    if (pm.response.code === 200) {",
+							"        const responseJson = pm.response.json();",
+							"        pm.expect(responseJson).to.have.property('message');",
+							"        pm.expect(responseJson).to.have.property('peerReviewAssignment');",
+							"        pm.expect(responseJson).to.have.property('rubric');",
+							"        pm.expect(responseJson).to.have.property('assignment');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{student_token}}"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/peer-review",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"peer-review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Close Submissions (Teacher)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"const today = new Date();\r",
+							"const submissionDeadlineDate = new Date(today.getTime()-100); // 100ms ago\r",
+							"const submissionDeadlineISO = submissionDeadlineDate.toISOString();\r",
+							"\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"requestBody.submissonDeadline = submissionDeadlineISO;\r",
+							"pm.request.body.raw = JSON.stringify(requestBody);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Submission has status closed\", function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('assignment');\r",
+							"    pm.expect(jsonData.assignment).to.have.property('status');\r",
+							"    pm.expect(jsonData.assignment.status).to.equal('Closed Submission');\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Peer Review (Teacher)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const today = new Date();\r",
+							"const reviewDeadlineDate = new Date(today.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days in milliseconds\r",
+							"const reviewDeadlineIso = reviewDeadlineDate.toISOString();\r",
+							"\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"requestBody.ReviewDeadline = reviewDeadlineIso;\r",
+							"pm.request.body.raw = JSON.stringify(requestBody);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Peer review created successfully\", function() {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(responseJson).to.have.property('peerReviewAssignment');\r",
+							"    pm.expect(responseJson.peerReviewAssignment).to.have.property('id');\r",
+							"    pm.collectionVariables.set('peer_review_id', responseJson.peerReviewAssignment.id);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"NumberOfReviewersPerSubmission\": 1,\r\n  \"ReviewerAssignmentMode\": \"manual\",\r\n  \"PeerReviewPairings\": [\r\n    {\r\n      \"ReviewerStudentID\": \"{{student2_id}}\",\r\n      \"RevieweeStudentID\": \"{{student_id}}\",\r\n      \"RevieweeSubmissionID\": \"{{submission_id}}\",\r\n      \"Status\": \"Pending\"\r\n    }\r\n  ],\r\n  \"Rubric\": {\r\n    \"Criteria\": [\r\n      {\r\n        \"Title\": \"Try Criterion\",\r\n        \"Description\": \"Sample description for the criterion\",\r\n        \"MinScore\": 0,\r\n        \"MaxScore\": 10\r\n      }\r\n    ]\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/peer-review",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"peer-review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Peer Review (Student2)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student can submit peer review\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{student2_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"PeerReviewID\": \"{{peer_review_id}}\",\r\n  \"Pairing\": {\r\n    \"ReviewerStudentID\": \"{{student2_id}}\",\r\n    \"RevieweeStudentID\": \"{{student_id}}\",\r\n    \"RevieweeSubmissionID\": \"{{submission_id}}\",\r\n    \"Status\": \"Completed\",\r\n    \"ReviewResults\": {\r\n      \"PerCriterionScoresAndJustifications\": {\r\n        \"Try Criterion\": {\r\n          \"Score\": 5,\r\n          \"Justification\": \"This is a justification!\"\r\n        }\r\n      },\r\n      \"ReviewTimestamp\": \"2025-06-07T01:43:57.835Z\"\r\n    }\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/peer-review/submit",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"peer-review",
+						"submit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Close Peer Review (Teacher)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const today = new Date();\r",
+							"const reviewDeadlineDate = new Date(today.getTime() -100); // now - 100 ms\r",
+							"const reviewDeadlineIso = reviewDeadlineDate.toISOString();\r",
+							"\r",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};\r",
+							"requestBody.ReviewDeadline = reviewDeadlineIso;\r",
+							"pm.request.body.raw = JSON.stringify(requestBody);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Peer review closed successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(pm.response.json().message).to.eql(\"Peer review closed successfully\");\r",
+							"    pm.expect(pm.response.json().peerReview.Status).to.eql(\"Peer Review Closed\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/peer-review",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"peer-review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start Compute Results (Teacher)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Check if the response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.expect(pm.response.json().results).to.have.property('AggregatedByAssignment');\r",
+							"    pm.expect(pm.response.json().results).to.have.property('AggregatedBySubmission');\r",
+							"    pm.expect(pm.response.json().results).to.have.property('AggregatedByReview');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/peer-review/start-compute-results",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"assignments",
+						"{{assignment_id}}",
+						"peer-review",
+						"start-compute-results"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:30160",
+			"type": "string"
+		},
+		{
+			"key": "auth_service_url",
+			"value": "http://localhost:30110",
+			"type": "string"
+		},
+		{
+			"key": "student_mail",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "student_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "teacher_mail",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "teacher_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "student_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "teacher_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "assignment_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "submission_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "student2_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "student2_mail",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "student2_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "peer_review_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

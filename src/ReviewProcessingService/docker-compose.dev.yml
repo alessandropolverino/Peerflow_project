@@ -1,0 +1,56 @@
+# This file is used to define the services for the development environment.
+
+# this template contains following placeholders to edit:
+# processing: Name of the service (e.g., "auth")
+# processing-service-mongo: Name of the MongoDB volume (e.g., "auth-mongo-volume")
+# processing-service-db: Name of the database (e.g., "auth-db")
+# processing-network: Name of the network (e.g., "auth-network")
+
+services:
+  processing-mongo:
+    image: mongo:8.0.9
+    container_name: processing-mongo
+    ports:
+      - "27027:27017"
+    volumes:
+      - processing-service-mongo:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=processing-service-db
+    networks:
+      - processing-network
+    restart: unless-stopped
+  processing-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: processing-service
+    ports:
+      - "3005:3000" # edit port
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@processing-mongo:27017/processing-service-db?authSource=admin
+      - NODE_ENV=development
+    depends_on:
+      - processing-mongo
+    networks:
+      - processing-network
+    restart: unless-stopped
+
+    
+
+
+
+volumes:
+  processing-service-mongo:
+    driver: local
+
+networks:
+  processing-network:
+    driver: bridge
+    name: processing-network
+  

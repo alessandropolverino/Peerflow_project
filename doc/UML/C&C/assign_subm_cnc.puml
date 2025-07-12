@@ -1,0 +1,65 @@
+@startuml
+
+package "PeerFlow Client" {
+  component "Web Application" as WebApp
+}
+
+component "Orchestrator" as Orch
+interface "IAPIGateway" as IAPIG
+' Orchestrator provides API Gateway interface
+Orch -up- IAPIG
+
+package "PeerFlow Microservices" {
+  component "Auth & Profiling Service" as Auth
+  interface "IAuthentication" as IAuth
+  ' Auth Service provides authentication interface
+  Auth -up- IAuth
+
+  component "Assignment Service" as Assign
+  interface "IAssignment" as IAssignment
+  ' Assignment Service provides its interfaces
+  Assign -up- IAssignment
+
+  component "Assignment Submission Service" as AssignSubm
+  interface "ISubmission" as ISubmission
+  ' Assignment Submission Service provides its interface
+  AssignSubm -up- ISubmission
+
+
+  component "Other Services" as OtherServices
+  interface "IOtherServicesAPI" as IOtherAPI
+  ' Other Services provide their API interface
+  OtherServices -up- IOtherAPI
+}
+
+package "Data Layer" {
+  database "Assignment Submission DB" as AssignSubmDB
+  database "File Storage" as FileStorageDB
+  database "Auth & Profiling DB" as AuthDB
+}
+
+' WebApp uses Orchestrator as API Gateway
+WebApp -down-> IAPIG : HTTP POST (Text + Attachments)
+
+' Orchestrator uses Auth Service for authorization
+Orch -down-> IAuth : verifyJWT()
+
+' Orchestrator uses Assignment Service to check user is in assignment
+Orch -down-> IAssignment : isUserInAssignment(User ID, Assignment ID)
+
+
+' Orchestrator uses Assignment Submission Service for submission metadata
+Orch -down-> ISubmission : submitAssignment(Text, File References)
+
+
+
+' Interactions with DBs
+AssignSubm -down-> AssignSubmDB : Create/Update\nSubmission Record
+Auth -down-> AuthDB : Manage User Profiles
+AssignSubm -down-> FileStorageDB
+' Orchestrator uses File Storage Service for attachments
+Orch -down-> FileStorageDB : uploadFile(Attachment Data)
+
+"PeerFlow Microservices" -[hidden]down- "Data Layer"
+
+@enduml

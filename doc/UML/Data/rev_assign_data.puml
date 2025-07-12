@@ -1,0 +1,40 @@
+@startuml
+package "Review Assignment Service (MongoDB Instance)" {
+  class Rubric {
+    + _id: ObjectId
+    --
+    - Criteria: List<CriterionDocument>
+  }
+
+  class CriterionDocument <<Embedded Document>> {
+    - Title: String
+    - Description: Text
+    - MinScore: Integer
+    - MaxScore: Integer
+  }
+
+  class PeerReviewAssignment {
+    + _id: ObjectId
+    --
+    - AssignmentID: String
+    - NumberOfReviewersPerSubmission: Integer
+    - ReviewDeadline: DateTime
+    - RubricID: String
+    - ReviewerAssignmentMode: String <<Enum: Automatic, Manual>>
+    - PeerReviewPairings: List<PeerReviewPairingDocument>
+  }
+
+  class PeerReviewPairingDocument <<Embedded Document>> {
+    - ReviewerStudentID: String
+    - RevieweeSubmissionID: String
+    - Status: String <<Enum: In progress, Completed>>
+    - ReviewResults: ReviewResultDocument
+  }
+
+  class ReviewResultDocument <<Embedded Document>> {
+    - PerCriterionScoresAndJustifications: Map<String, Map<String, String | Integer>>
+    - ReviewTimestamp: DateTime
+  }
+}
+
+@enduml

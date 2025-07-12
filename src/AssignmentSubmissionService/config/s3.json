@@ -1,0 +1,14 @@
+{
+    "identities": [
+        {
+            "name": "admin",
+            "credentials": [
+                {
+                  "accessKey": "AKIAIOSFODNN7EXAMPLE", 
+                  "secretKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+                }
+            ],
+            "actions": ["*"]
+        }
+    ]
+}

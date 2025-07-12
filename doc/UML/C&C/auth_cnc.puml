@@ -1,0 +1,64 @@
+@startuml Authentication Flow C&C
+!theme plain
+
+
+
+left to right direction
+
+skinparam padding 5
+skinparam NodeMargin 40
+
+
+package "PeerFlow Client" {
+  component "Web Application" as WebApp
+}
+
+component "Orchestrator" as Orch 
+interface "IAPIGateway" as IAPIG
+Orch -up- IAPIG
+
+package "PeerFlow Microservices" {
+  component "Auth & Profiling Service" as Auth
+  interface "IAuthentication" as IAuth
+  interface "IUsers" as IUsers
+  interface "IPublicKey" as IPublicKey
+  Auth -up- IAuth
+  Auth -up- IUsers
+  Auth -up- IPublicKey
+
+  component "Other Services" as OtherServices 
+  interface "IOtherServicesAPI" as IOtherAPI
+  OtherServices -up- IOtherAPI
+
+  IAuth-[hidden]left-OtherServices 
+}
+
+' layout, it is hidden
+Orch -[hidden]right-"PeerFlow Microservices"
+
+package "Data Layer" {
+  database "Auth DB" as AuthDB
+}
+
+
+' WebApp interacts directly with Auth & Profiling Service 
+' for specific token/profile actions (conceptual)
+WebApp -> IAuth : "Login / Signup / Refresh Token"
+
+' Orchestrator uses Auth & Profiling Service's interfaces
+Orch -down-> IPublicKey : getPublicKey()
+Orch -> IUsers : Profile management operations
+
+' Orchestrator uses Other Services' API interface
+Orch -down-> IOtherAPI : Forward Authorized Request
+
+' Auth & Profiling Service interacts with its DB
+Auth -right-> AuthDB : Read/Write User Data
+
+
+
+
+WebApp -down-> IAPIG : "Access Other Services"
+
+
+@enduml

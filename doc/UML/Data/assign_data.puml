@@ -1,0 +1,18 @@
+@startuml
+
+package "Assignment Service (MongoDB Instance)" {
+  class Assignment {
+    + _id: ObjectId
+    --
+    - Name: String
+    - Description: Text
+    - SubmissionDeadline: DateTime
+    - Status: String <<Enum: assigned, preparing review, under review, completed, deleted>>
+    - LastModifiedDate: DateTime
+    - CreatedDate: DateTime
+    - TeacherID: String
+    - InvolvedStudentIDs: List<String>
+  }
+}
+
+@enduml

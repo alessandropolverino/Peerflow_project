@@ -1,0 +1,139 @@
+@startuml
+autonumber
+actor "Teacher" as Teacher
+participant "Web Application" as WebApp
+participant "Orchestrator" as Orch
+participant "Auth & Profiling Service" as Auth
+participant "Review Assignment Service" as RevAssign
+participant "Review Assignment DB" as RevAssignDB
+participant "Review Processing Service" as RevProc
+database "Review Processing DB (MongoDB)" as RevProcDB
+participant "Assignment Service" as Assign
+participant "Assignment DB" as AssignDB
+actor "User (Teacher/Student for display)" as User
+
+' 1. Teacher manually triggers aggregation
+Teacher -> WebApp : Navigates to Assignment Details & Clicks "Start Aggregation" Button
+activate WebApp
+WebApp -> Orch : HTTP POST /api/assignments/{id}/start-review-aggregation (Bearer Token: Teacher's Access Token)
+activate Orch
+
+' 2. Orchestrator authorizes the teacher's request
+Orch -> Auth : verifyJWT(Access Token)
+activate Auth
+Auth --> Orch : Valid (Teacher ID, Role)
+deactivate Auth
+
+Orch -> RevAssign : getPeerReviewStatus(AssignmentID X) (IPeerReviewStatus)
+activate RevAssign
+
+
+' 3. Orchestrator extracts all raw data from Review Assignment Service
+RevAssign -> RevAssignDB : Query Peer Review Status for Assignment X
+activate RevAssignDB
+RevAssignDB --> RevAssign : Peer Review Status
+deactivate RevAssignDB
+
+RevAssign --> Orch : Peer ReviewStatus 
+deactivate RevAssign
+
+alt If Peer Review deadline is passed for Assignment X
+  Orch -> RevAssign : getCompletedReviews(AssignmentID X) (IGetCompletedReviews)
+  activate RevAssign
+  RevAssign -> RevAssignDB : Query all completed reviews for Assignment X
+  activate RevAssignDB
+  RevAssignDB --> RevAssign : Raw Completed Peer Review Records
+  deactivate RevAssignDB
+  RevAssign --> Orch : Raw Completed Peer Review Records
+  deactivate RevAssign
+
+  Orch -> RevAssign : getRubric(AssignmentID X) (IGetRubric)
+  activate RevAssign
+  RevAssign -> RevAssignDB : Query Rubric for Assignment X
+  activate RevAssignDB
+  RevAssignDB --> RevAssign : Rubric Details
+  deactivate RevAssignDB
+  RevAssign --> Orch : Rubric Details
+  deactivate RevAssign
+
+  Orch -> RevAssign : getReviewAssignments(AssignmentID X) (IGetReviewAssignments)
+  activate RevAssign
+  RevAssign -> RevAssignDB : Query Peer Review Assignment Pairings for Assignment X
+  activate RevAssignDB
+  RevAssignDB --> RevAssign : Peer Review Pairings
+  deactivate RevAssignDB
+  RevAssign --> Orch : Peer Review Pairings
+  deactivate RevAssign
+
+  ' 4. Orchestrator triggers Review Processing Service with extracted data
+  Orch -> RevProc : startReviewAggregation(AssignmentID X, RawReviews, Rubric, Pairings) (IStartReviewAggregationAPI)
+  activate RevProc
+  Note right of RevProc: ETL Process Begins: Transform & Load
+
+  RevProc -> RevProc : Calculate Aggregated Results
+  Note right of RevProc: Aggregates: Overall by Assignment, Per Submission, Per Review
+
+  RevProc -> RevProcDB : Store AggregatedByAssignmentResult
+  activate RevProcDB
+  RevProcDB --> RevProc : Confirmation
+  deactivate RevProcDB
+
+  RevProc -> RevProcDB : Store AggregatedBySubmissionResult
+  activate RevProcDB
+  RevProcDB --> RevProc : Confirmation
+  deactivate RevProcDB
+
+  RevProc -> RevProcDB : Store AggregatedByReviewResult
+  activate RevProcDB
+  RevProcDB --> RevProc : Confirmation
+  deactivate RevProcDB
+  deactivate RevProc
+
+  ' 5. Orchestrator updates Assignment Service status
+  Orch -> Assign : updateAssignmentStatus(AssignmentID X, "Completed") (IAssignmentStatus)
+  activate Assign
+  Assign -> AssignDB : Update Assignment X Status to Completed
+  activate AssignDB
+  AssignDB --> Assign : Confirmation
+  deactivate AssignDB
+  deactivate Assign
+
+  Orch --> WebApp : Aggregation Success Confirmation
+  deactivate Orch
+  WebApp -> Teacher : Displays Success Message / Updates UI
+  deactivate WebApp
+
+else Peer Review Period Not Completed / Not Eligible
+  RevAssign --> Orch : Status (e.g., "Not Completed", "Review Still In Progress")
+  deactivate RevAssign
+  Orch --> WebApp : Error: Aggregation Not Possible
+  deactivate Orch
+  WebApp -> Teacher : Displays Error Message
+  deactivate WebApp
+end
+
+' 6. Make Results Available for Display (Later, independent of trigger)
+Note over Orch,User: Later, User wants to view results.
+User -> WebApp : Request to View Results for Assignment X
+activate WebApp
+WebApp -> Orch : HTTP GET /api/results/assignments/{id} (Bearer Token)
+activate Orch
+Orch -> Auth : verifyJWT(Token)
+activate Auth
+Auth --> Orch : Valid (User ID, Role - Teacher or Student)
+deactivate Auth
+
+Orch -> RevProc : getAggregatedResults(AssignmentID X) (IGetAggregatedResults)
+activate RevProc
+RevProc -> RevProcDB : Query Aggregated Results
+activate RevProcDB
+RevProcDB --> RevProc : Aggregated Data
+deactivate RevProcDB
+RevProc --> Orch : Aggregated Data
+deactivate RevProc
+
+Orch --> WebApp : Aggregated Results Data
+deactivate Orch
+WebApp -> User : Displays Aggregated Results
+deactivate WebApp
+@enduml

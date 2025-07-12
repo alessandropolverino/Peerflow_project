@@ -1,0 +1,70 @@
+@startuml
+skinparam rectangle {
+  BorderColor black
+  FontColor black
+}
+skinparam component {
+  BorderColor black
+  FontColor black
+}
+skinparam database {
+  BorderColor black
+  FontColor black
+}
+
+node "Physical/Virtual Server" as Server {
+  component "Operating System (e.g., Ubuntu)" as OS
+
+  rectangle "Minikube / Kubernetes Cluster" as Kubernetes {
+    rectangle "Kubernetes Control Plane (Master Node)" as ControlPlane
+    rectangle "Kubernetes Worker Node (Single Node)" as WorkerNode {
+
+      component "Orchestrator Pod(s)" as OrchPod
+      component "Auth & Profiling Service Pod(s)" as AuthPod
+      component "Assignment Service Pod(s)" as AssignPod
+      component "Assignment Submission Service Pod(s)" as AssignSubmPod
+      component "Review Assignment Service Pod(s)" as RevAssignPod
+      component "Review Processing Service Pod(s)" as RevProcPod
+      component "Notification Service Pod(s)" as NotifPod
+      component "File Storage Service Pod(s)" as FileStoragePod
+      component "Web Application Pod(s)" as WebAppPod
+
+      database "Auth DB Instance" as AuthDBInst
+      database "Assignment DB Instance" as AssignDBInst
+      database "Assignment Submission DB Instance" as AssignSubmDBInst
+      database "Review Assignment DB Instance" as RevAssignDBInst
+      database "Review Processing DB Instance" as RevProcDBInst
+      database "File Storage DB Instance" as FileStorageDBInst
+    }
+  }
+}
+
+cloud "Internet" as Internet
+
+Internet -- WebAppPod : HTTP Traffic
+
+OS -- Kubernetes : Hosts Kubernetes Environment
+ControlPlane .. WorkerNode : Manages Pods/Resources
+
+
+
+' Internal Pod-to-Pod communication (via Kubernetes network)
+OrchPod ..> AuthPod
+OrchPod ..> AssignPod
+OrchPod ..> AssignSubmPod
+OrchPod ..> RevAssignPod
+OrchPod ..> RevProcPod
+OrchPod ..> NotifPod
+OrchPod ..> FileStoragePod
+WebAppPod ..> OrchPod : (API Gateway calls)
+WebAppPod ..> AuthPod : (Direct Auth calls)
+
+' Service-to-DB communication
+AuthPod ..> AuthDBInst
+AssignPod ..> AssignDBInst
+AssignSubmPod ..> AssignSubmDBInst
+RevAssignPod ..> RevAssignDBInst
+RevProcPod ..> RevProcDBInst
+FileStoragePod ..> FileStorageDBInst
+
+@enduml

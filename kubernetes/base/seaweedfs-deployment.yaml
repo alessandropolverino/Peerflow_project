@@ -1,0 +1,256 @@
+# ConfigMap for S3 configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seaweedfs-s3-config
+data:
+  s3.json: |
+    {
+        "identities": [
+            {
+                "name": "admin",
+                "credentials": [
+                    {
+                      "accessKey": "AKIAIOSFODNN7EXAMPLE", 
+                      "secretKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+                    }
+                ],
+                "actions": ["*"]
+            }
+        ]
+    }
+---
+# Persistent Volume Claims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seaweedfs-master-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seaweedfs-volume-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seaweedfs-filer-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# SeaweedFS Master
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seaweedfs-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seaweedfs-master
+  template:
+    metadata:
+      labels:
+        app: seaweedfs-master
+    spec:
+      containers:
+      - name: seaweedfs-master
+        image: chrislusf/seaweedfs
+        command: ["weed"]
+        args: ["master","-ip=seaweedfs-master", "-ip.bind=0.0.0.0", "-metricsPort=9324", "-mdir=./mdata"]
+        ports:
+        - containerPort: 9333
+        - containerPort: 19333
+        - containerPort: 9324
+        volumeMounts:
+        - name: master-data
+          mountPath: /mdata
+      volumes:
+      - name: master-data
+        persistentVolumeClaim:
+          claimName: seaweedfs-master-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs-master
+spec:
+  selector:
+    app: seaweedfs-master
+  ports:
+  - name: master
+    port: 9333
+    targetPort: 9333
+  - name: grpc
+    port: 19333
+    targetPort: 19333
+  - name: metrics
+    port: 9324
+    targetPort: 9324
+---
+# SeaweedFS Volume
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seaweedfs-volume
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seaweedfs-volume
+  template:
+    metadata:
+      labels:
+        app: seaweedfs-volume
+    spec:
+      containers:
+      - name: seaweedfs-volume
+        image: chrislusf/seaweedfs
+        command: ["weed"]
+        args: ["volume","-mserver=seaweedfs-master:9333", "-ip.bind=0.0.0.0", "-port=8079", "-metricsPort=9325", "-dir=/data"]
+        ports:
+        - containerPort: 8079
+        - containerPort: 18080
+        - containerPort: 9325
+        volumeMounts:
+        - name: volume-data
+          mountPath: /data
+      volumes:
+      - name: volume-data
+        persistentVolumeClaim:
+          claimName: seaweedfs-volume-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs-volume
+spec:
+  selector:
+    app: seaweedfs-volume
+  ports:
+  - name: volume
+    port: 8079
+    targetPort: 8079
+  - name: grpc
+    port: 18080
+    targetPort: 18080
+  - name: metrics
+    port: 9325
+    targetPort: 9325
+---
+# SeaweedFS Filer
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seaweedfs-filer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seaweedfs-filer
+  template:
+    metadata:
+      labels:
+        app: seaweedfs-filer
+    spec:
+      containers:
+      - name: seaweedfs-filer
+        image: chrislusf/seaweedfs
+        command: ["weed"]
+        args: ["filer","-master=seaweedfs-master:9333", "-ip.bind=0.0.0.0", "-metricsPort=9326"]
+        ports:
+        - containerPort: 8888
+        - containerPort: 18888
+        - containerPort: 9326
+        volumeMounts:
+        - name: filer-data
+          mountPath: /data
+      volumes:
+      - name: filer-data
+        persistentVolumeClaim:
+          claimName: seaweedfs-filer-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs-filer
+spec:
+  selector:
+    app: seaweedfs-filer
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    name: filer
+    port: 8888
+    targetPort: 8888
+    nodePort: 30031
+  - name: grpc
+    port: 18888
+    targetPort: 18888
+  - name: metrics
+    port: 9326
+    targetPort: 9326
+---
+# SeaweedFS S3
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seaweedfs-s3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seaweedfs-s3
+  template:
+    metadata:
+      labels:
+        app: seaweedfs-s3
+    spec:
+      containers:
+      - name: seaweedfs-s3
+        image: chrislusf/seaweedfs
+        command: ["weed"]
+        args: ["s3","-filer=seaweedfs-filer:8888", "-ip.bind=0.0.0.0", "-metricsPort=9327", "-config=/etc/seaweedfs/s3.json"]
+        ports:
+        - containerPort: 8333
+        - containerPort: 9327
+        volumeMounts:
+        - name: s3-config
+          mountPath: /etc/seaweedfs
+          readOnly: true
+      volumes:
+      - name: s3-config
+        configMap:
+          name: seaweedfs-s3-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seaweedfs-s3-service
+spec:
+  selector:
+    app: seaweedfs-s3
+  ports:
+  - name: s3
+    port: 8333
+    targetPort: 8333
+  - name: metrics
+    port: 9327
+    targetPort: 9327
+---

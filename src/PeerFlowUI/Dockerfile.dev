@@ -1,0 +1,16 @@
+FROM node:22.15.0-alpine
+
+WORKDIR /app
+
+# Install dependencies first to leverage Docker cache
+COPY ./src/package*.json ./
+RUN rm -rf node_modules package-lock.json
+COPY ./.env /app/
+RUN npm install --legacy-peer-deps
+
+
+# The source code will be mounted as a volume
+# This allows for hot reloading during development
+
+EXPOSE 3000
+CMD ["npm", "run", "dev"]

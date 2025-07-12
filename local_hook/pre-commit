@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# pre-commit hook
+# Launch unit tests before allowing commit.
+#
+# Installation:
+#   1. Save this file as '.git/hooks/pre-commit' in your local repository.
+#   2. Make the file executable: 'chmod +x .git/hooks/pre-commit'
+
+# --- HOOK LOGIC ---
+
+echo "Running tests before commit..."
+echo "==================================================================="
+
+
+# Change to the project root directory
+cd "$(git rev-parse --show-toplevel)"
+
+# Run the test script using make
+if command -v make >/dev/null 2>&1; then
+    make test_up
+    if [ $? -ne 0 ]; then
+        make test_clean
+        echo "❌ Tests failed! Commit aborted."
+        echo "==================================================================="
+        echo " "
+        exit 1
+    fi
+    make test_clean
+    echo "✅ All tests passed! Proceeding with commit."
+    echo "==================================================================="
+    echo " "
+else
+    echo "⚠️  make not found. Commit aborted."
+    echo "==================================================================="
+    echo " "
+    exit 1
+fi
+
+exit 0

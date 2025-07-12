@@ -1,0 +1,1 @@
+from .main import assignments_router

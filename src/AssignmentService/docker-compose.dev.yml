@@ -1,0 +1,50 @@
+# This file is used to define the services for the development environment.
+
+services:
+  assignment-service-mongo:
+    image: mongo:8.0.9
+    container_name: assignment-service-mongo
+    ports:
+      - "27021:27017" # edit port
+    volumes:
+      - assignment-service-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=assignment-service-db
+    networks:
+      - assignment-service-network
+    restart: unless-stopped
+  assignment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: assignment-service
+    ports:
+      - "3002:3000" # edit port
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@assignment-service-mongo:27017/assignment-service-db?authSource=admin
+      - NODE_ENV=development
+    depends_on:
+      - assignment-service-mongo
+    networks:
+      - assignment-service-network
+    restart: unless-stopped
+
+    
+
+
+
+volumes:
+  assignment-service-data:
+    driver: local
+
+networks:
+  assignment-service-network:
+    driver: bridge
+    name: assignment-service-network
+  

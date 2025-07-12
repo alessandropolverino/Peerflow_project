@@ -1,0 +1,24 @@
+# This file is used to define the services for the testing environment.
+
+services:
+
+  orchestrator-test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: orchestrator-test-runner
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+    env_file:
+      - .env.test
+    environment:
+      - NODE_ENV=test
+      - PYTHONPATH=/app
+    networks:
+      - orchestrator-service-test-network
+
+networks:
+  orchestrator-service-test-network:
+    driver: bridge
+    name: orchestrator-service-test-network

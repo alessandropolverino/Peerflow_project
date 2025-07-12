@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assignment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: assignment-service
+  template:
+    metadata:
+      labels:
+        app: assignment-service
+    spec:
+      containers:
+      - name: assignment-service
+        image: giosuciaravola/peerflow-assignment-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MONGO_URI
+          value: "mongodb://admin:admin123@mongodb-assignment-service:27017/assignment-service-db?authSource=admin"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: assignment-service
+spec:
+  selector:
+    app: assignment-service
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 3002
+    targetPort: 3000
+    nodePort: 30020

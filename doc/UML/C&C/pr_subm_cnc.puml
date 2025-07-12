@@ -1,0 +1,78 @@
+@startuml Peer Review Submission Component and Connector diagram
+
+package "PeerFlow Client" {
+  component "Web Application" as WebApp
+}
+
+component "Orchestrator" as Orch
+interface "IAPIGateway" as IAPIG
+' Orchestrator provides API Gateway interface
+Orch -up- IAPIG
+
+package "PeerFlow Microservices" {
+  component "Auth & Profiling Service" as Auth
+  interface "IAuthorization" as IAuthz
+  ' Auth Service provides authorization interface
+  Auth -up- IAuthz
+
+
+  component "Review Assignment Service" as RevAssign
+  interface "IGetAssignedReviews" as IGetAssignedReviews
+  interface "IGetRubric" as IGetRubric
+  ' This was moved from RevProc
+  interface "ISubmitReview" as ISubmitReview 
+  ' Review Assignment Service provides its interfaces
+  RevAssign -up- IGetAssignedReviews
+  RevAssign -up- IGetRubric
+  RevAssign -up- ISubmitReview
+
+
+  component "Assignment Submission Service" as AssignSubm
+  interface "IGetSubmissionContent" as IGetSubmissionContent
+  ' Assignment Submission Service provides its interface
+  AssignSubm -up- IGetSubmissionContent
+
+
+
+  ' Review Processing Service is NOT directly involved in submitting reviews,
+  ' so it's not in this diagram or is considered part of "Other Services" for this flow.
+  ' If it's a separate component but not active here, it would go into OtherServices
+  component "Other Services" as OtherServices
+  interface "IOtherServicesAPI" as IOtherAPI
+  OtherServices -up- IOtherAPI
+}
+
+package "Data Layer" {
+  database "Review Assignment DB" as RevAssignDB
+  database "Assignment Submission DB" as AssignSubmDB
+  database "File Storage DB" as FileStorageDB
+  database "Auth DB" as AuthDB
+}
+
+' WebApp uses Orchestrator as API Gateway
+WebApp -down-> IAPIG : HTTP GET /api/assigned-reviews\nHTTP GET /api/submissions/{id}/content\nHTTP POST /api/reviews
+
+' Orchestrator uses Auth Service for authorization
+Orch -down-> IAuthz : verifyJWT()
+
+' Orchestrator interacts with Review Assignment Service
+Orch -down-> IGetAssignedReviews : getAssignedReviews()
+Orch -down-> IGetRubric : getRubric()
+' This interaction is now with RevAssign
+Orch -down-> ISubmitReview : submitReview()
+
+' Orchestrator interacts with Assignment Submission Service
+Orch -down-> IGetSubmissionContent : getSubmissionContent()
+
+' Orchestrator interacts with File Storage Service
+Orch -down-> FileStorageDB : getFile()
+
+
+' Interactions with DBs
+RevAssign -down-> RevAssignDB : Read Assigned Reviews, Read Rubrics, Store Review Record
+AssignSubm -down-> AssignSubmDB : Read Submission Content (text, file refs)
+Auth -down-> AuthDB : Read User Profiles
+
+"PeerFlow Microservices" -[hidden]down- "Data Layer"
+
+@enduml

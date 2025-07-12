@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-profiling-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-profiling-service
+  template:
+    metadata:
+      labels:
+        app: auth-profiling-service
+    spec:
+      containers:
+      - name: auth-profiling-service
+        image: giosuciaravola/peerflow-auth-profiling-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MONGO_URI
+          value: "mongodb://admin:admin123@mongodb-auth-service:27017/auth-service?authSource=admin"
+        - name: PRIVATE_KEY_PATH
+          value: "/app/keys/private_key.pem"
+        - name: PUBLIC_KEY_PATH
+          value: "/app/keys/public_key.pem"
+        - name: PRIVATE_KEY_PASSWORD
+          value: "ciao"
+        - name: JWT_ACC_EXPIRATION_MINUTES
+          value: "60"  # Should be quoted
+        - name: JWT_REF_EXPIRATION_MINUTES
+          value: "3600"  # Should be quoted
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        volumeMounts:
+        - name: keys-volume
+          mountPath: /app/keys
+      volumes:
+      - name: keys-volume
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-profiling-service
+spec:
+  selector:
+    app: auth-profiling-service
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+    nodePort: 30010

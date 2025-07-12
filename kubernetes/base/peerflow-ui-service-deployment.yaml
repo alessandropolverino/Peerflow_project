@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peerflow-ui-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peerflow-ui-service
+  template:
+    metadata:
+      labels:
+        app: peerflow-ui-service
+    spec:
+      containers:
+      - name: peerflow-ui-service
+        image: giosuciaravola/peerflow-ui-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: peerflow-ui-service
+spec:
+  selector:
+    app: peerflow-ui-service
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 3007
+    targetPort: 3000
+    nodePort: 30070

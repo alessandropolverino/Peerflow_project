@@ -1,0 +1,50 @@
+# This file is used to define the services for the development environment.
+
+services:
+  review-assignment-mongo:
+    image: mongo:8.0.9
+    container_name: review-assignment-mongo
+    ports:
+      - "27025:27017" # edit port
+    volumes:
+      - review-assignment-mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=review-assignment-db
+    networks:
+      - review-assignment-network
+    restart: unless-stopped
+  review-assignment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: review-assignment-service
+    ports:
+      - "3004:3000" # edit port
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
+    environment:
+      - MONGO_URI=mongodb://admin:admin123@review-assignment-mongo:27017/review-assignment-db?authSource=admin
+      - NODE_ENV=development
+    depends_on:
+      - review-assignment-mongo
+    networks:
+      - review-assignment-network
+    restart: unless-stopped
+
+    
+
+
+
+volumes:
+  review-assignment-mongo-data:
+    driver: local
+
+networks:
+  review-assignment-network:
+    driver: bridge
+    name: review-assignment-network
+  

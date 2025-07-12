@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-assignment-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: review-assignment-service
+  template:
+    metadata:
+      labels:
+        app: review-assignment-service
+    spec:
+      containers:
+      - name: review-assignment-service
+        image: giosuciaravola/peerflow-review-assignment-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: MONGO_URI
+          value: "mongodb://admin:admin123@mongodb-review-assignment-service:27017/review-assignment-db?authSource=admin"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: review-assignment-service
+spec:
+  selector:
+    app: review-assignment-service
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 3004
+    targetPort: 3000
+    nodePort: 30040

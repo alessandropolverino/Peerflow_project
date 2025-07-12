@@ -1,0 +1,438 @@
+{
+	"info": {
+		"_postman_id": "load-test-50-students",
+		"name": "PeerFlow Load Test - 50 Students",
+		"description": "Load test simulation: 50 students registration, login, assignment creation and submission with 1ms delays and 1000ms response time validation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup - Create Teacher Account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const randomMail = 'teacher_' + Math.random().toString(36).substring(2, 15) + '@loadtest.com';",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};",
+							"requestBody.email = randomMail;",
+							"pm.request.body.raw = JSON.stringify(requestBody);",
+							"pm.collectionVariables.set('teacher_mail', randomMail);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Teacher account created successfully', function () {",
+							"    pm.response.to.have.status(201);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('user');",
+							"    pm.collectionVariables.set('teacher_id', responseJson.user.id);",
+							"});",
+							"",
+							"pm.test('Response time is less than 1000ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"password\": \"password123\",\n  \"role\": \"Teacher\",\n  \"name\": \"Load\",\n  \"surname\": \"Test Teacher\"\n}"
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/signup",
+					"host": ["{{auth_service_url}}"],
+					"path": ["authentication", "signup"]
+				}
+			}
+		},
+		{
+			"name": "Setup - Login Teacher",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Teacher login successful', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('access_token');",
+							"    pm.collectionVariables.set('teacher_token', responseJson.access_token);",
+							"});",
+							"",
+							"pm.test('Response time is less than 1000ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{teacher_mail}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/login",
+					"host": ["{{auth_service_url}}"],
+					"path": ["authentication", "login"]
+				}
+			}
+		},
+		{
+			"name": "Student Registration",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate unique student email",
+							"const studentIndex = pm.info.iteration + 1;",
+							"const randomSuffix = Math.random().toString(36).substring(2, 8);",
+							"const studentMail = `student_${studentIndex}_${randomSuffix}@loadtest.com`;",
+							"",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};",
+							"requestBody.email = studentMail;",
+							"requestBody.name = `Student${studentIndex}`;",
+							"requestBody.surname = `LoadTest${studentIndex}`;",
+							"pm.request.body.raw = JSON.stringify(requestBody);",
+							"",
+							"// Store student email for login",
+							"pm.globals.set(`student_${studentIndex}_mail`, studentMail);",
+							"",
+							"// Add 1ms delay between registrations",
+							"if (studentIndex > 1) {",
+							"    setTimeout(() => {}, 1);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student registration successful', function () {",
+							"    pm.response.to.have.status(201);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('user');",
+							"    ",
+							"    const studentIndex = pm.info.iteration + 1;",
+							"    pm.globals.set(`student_${studentIndex}_id`, responseJson.user.id);",
+							"    ",
+							"    // Collect all student IDs for assignment creation",
+							"    let studentIds = pm.globals.get('all_student_ids') || [];",
+							"    if (typeof studentIds === 'string') {",
+							"        studentIds = JSON.parse(studentIds);",
+							"    }",
+							"    studentIds.push(responseJson.user.id);",
+							"    pm.globals.set('all_student_ids', JSON.stringify(studentIds));",
+							"});",
+							"",
+							"pm.test('Response time is less than 1000ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"password\": \"password123\",\n  \"role\": \"Student\"\n}"
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/signup",
+					"host": ["{{auth_service_url}}"],
+					"path": ["authentication", "signup"]
+				}
+			}
+		},
+		{
+			"name": "Student Login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Get student email for this iteration",
+							"const studentIndex = pm.info.iteration + 1;",
+							"const studentMail = pm.globals.get(`student_${studentIndex}_mail`);",
+							"",
+							"// Set the username in form data",
+							"pm.request.body.urlencoded.members.forEach(param => {",
+							"    if (param.key === 'username') {",
+							"        param.value = studentMail;",
+							"    }",
+							"});",
+							"",
+							"// Add 1ms delay between logins",
+							"if (studentIndex > 1) {",
+							"    setTimeout(() => {}, 1);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Student login successful', function () {",
+							"    pm.response.to.have.status(200);",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.have.property('access_token');",
+							"    ",
+							"    const studentIndex = pm.info.iteration + 1;",
+							"    pm.globals.set(`student_${studentIndex}_token`, responseJson.access_token);",
+							"});",
+							"",
+							"pm.test('Response time is less than 1000ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_service_url}}/authentication/login",
+					"host": ["{{auth_service_url}}"],
+					"path": ["authentication", "login"]
+				}
+			}
+		},
+		{
+			"name": "Create Assignment (Teacher)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Only run this once after all students are registered",
+							"if (pm.info.iteration !== 0) {",
+							"    postman.setNextRequest(null);",
+							"    return;",
+							"}",
+							"",
+							"// Set submission deadline to 7 days from now",
+							"const today = new Date();",
+							"const submissionDeadlineDate = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));",
+							"const submissionDeadlineISO = submissionDeadlineDate.toISOString();",
+							"",
+							"// Get all student IDs",
+							"let studentIds = pm.globals.get('all_student_ids');",
+							"if (typeof studentIds === 'string') {",
+							"    studentIds = JSON.parse(studentIds);",
+							"}",
+							"",
+							"const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};",
+							"requestBody.submissonDeadline = submissionDeadlineISO;",
+							"requestBody.involvedStudentIds = studentIds;",
+							"pm.request.body.raw = JSON.stringify(requestBody);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response time is less than 1000ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Load Test Assignment\",\n  \"description\": \"Assignment for load testing with 50 students\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "assignments"]
+				}
+			}
+		},
+		{
+			"name": "Submit Assignment (Students)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Get student token for this iteration",
+							"const studentIndex = pm.info.iteration + 1;",
+							"const studentToken = pm.globals.get(`student_${studentIndex}_token`);",
+							"",
+							"// Update authorization header",
+							"pm.request.headers.upsert({",
+							"    key: 'Authorization',",
+							"    value: `Bearer ${studentToken}`",
+							"});",
+							"",
+							"// Update submission content",
+							"pm.request.body.formdata.members.forEach(param => {",
+							"    if (param.key === 'text_content') {",
+							"        param.value = `Load test submission from Student ${studentIndex} - ${new Date().toISOString()}`;",
+							"    }",
+							"});",
+							"",
+							"// Add 1ms delay between submissions",
+							"if (studentIndex > 1) {",
+							"    setTimeout(() => {}, 1);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response time is less than 1000ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer "
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "text_content",
+							"value": "Load test submission",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/assignments/{{assignment_id}}/submit",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "assignments", "{{assignment_id}}", "submit"]
+				}
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:30160",
+			"type": "string"
+		},
+		{
+			"key": "auth_service_url",
+			"value": "http://localhost:30110",
+			"type": "string"
+		},
+		{
+			"key": "teacher_mail",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "teacher_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "teacher_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "assignment_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

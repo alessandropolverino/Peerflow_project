@@ -1,0 +1,103 @@
+\chapter{Overall Description}
+
+\section{Product Perspective}
+
+\begin{justify}
+    PeerFlow will be a stand-alone application with a dedicated user interface. It is designed to operate within an academic context, with the goal of improving the evaluation and learning process in online education environments, particularly for MOOCs. Its microservices architecture will ensure that it can be integrated or extended in the future, if necessary, to connect with other educational systems or learning management platforms.
+\end{justify}
+
+\section{Production Functions}
+
+\begin{comment}
+        \item \textbf{Course Management:}
+        \begin{itemize}
+            \item Creation of new courses by teachers.
+            \item Modification and deletion of existing courses by teachers.
+            \item Viewing available courses by students.
+            \item Enrollment of students in courses.
+            \item Unenrollment of students from courses.
+        \end{itemize}
+\end{comment}
+
+\begin{justify}
+    The system (PeerFlow) will provide the following main functions:
+    \begin{itemize}
+        \item \textbf{Assignment Management:}
+        \begin{itemize}
+            \item Creation of assignments by teachers, including description, assessment rubrics, deadlines, and students involved.
+            \item Viewing of assigned submissions for students.
+            \item Submission of assignments by students (text and file attachments).
+            \item Monitoring the submission process by teachers.
+        \end{itemize}
+        \item \textbf{Peer Review Management:}
+        \begin{itemize}
+            \item Automatic (random) or manual (defined by the teacher) peer assignment for review purposes.
+            \item Receiving assigned submissions from peers to review for students.
+            \item Completing structured reviews with motivated feedback by students, based on defined rubrics.
+        \end{itemize}
+        \item \textbf{Results and Reporting Management:}
+        \begin{itemize}
+            \item Aggregation of evaluations.
+            \item Viewing evaluations received by students after the process is completed.
+            \item Accessing detailed evaluation reports for teachers.
+            \item Monitoring the review process by teachers.
+        \end{itemize}
+        \item \textbf{Authentication and Profiling:}
+        \begin{itemize}
+            \item Managing login, roles (teacher, student), and user profiles.
+        \end{itemize}
+    \end{itemize}
+\end{justify}
+
+\section{User Characteristics}
+
+\begin{justify}
+    PeerFlow will primarily be used by two categories of users:
+    \begin{itemize}
+    \item \textbf{Teachers:}
+    \begin{itemize}
+        \item Responsible for creating assignments and evaluation rubrics%, and managing courses.
+        \item Must be able to define assessment rubrics and deadlines.
+        \item Need to access detailed evaluation reports and monitor the submission and review process.
+    \end{itemize}
+    \item \textbf{Students:}
+    \begin{itemize}
+        %\item Must be able to enroll/unenroll in courses.
+        \item Responsible for submitting their work (text and file attachments) and reviewing peers' work.
+        \item Need an intuitive interface for uploading files and providing structured feedback.
+        \item Must be able to view the evaluations received after the process is completed.
+    \end{itemize}
+\end{itemize}
+\end{justify}
+
+\section{Constraints}
+
+\begin{justify}
+    \begin{itemize}
+        \item \textbf{Architectural:} The system must adopt a Service Oriented/Microservices Architecture.
+        \item \textbf{User Interface:} The User Interface (UI) must be included.
+        \item \textbf{Development:}
+        \begin{itemize}
+            \item Use of a Version Control System is mandatory.
+            \item Defining, implementing, and using a CI/CD pipeline is mandatory.
+            \item Use of Automatic Testing is mandatory.
+            \item Use of Containerization (Docker) is mandatory.
+            \item Use of Container Orchestration (Kubernetes) is mandatory.
+            \item Use of Infrastructure-as-Code Tools is optional.
+        \end{itemize}
+        \item \textbf{Deployment:} Deployment can occur on Microsoft Azure or on an Ubuntu VM (On Premise).
+        \item \textbf{Security:} The system must ensure the security of user data and submissions.
+        %\item \textbf{Collaboration:} The peer review process can only be performed among students enrolled in the same course as the assignment to be reviewed.
+    \end{itemize}
+\end{justify}
+
+\section{Assumptions and Dependencies}
+
+\begin{justify}
+    \begin{itemize}
+    \item It is assumed that users (teachers and students) have access to a stable internet connection.
+    \item It is assumed that teachers will provide clear and complete assessment rubrics for assignments.
+    \item The success of the system depends on the active participation of students in the review process.
+    %\item In the case of on-premise deployment, it is assumed that the provided Ubuntu VM is correctly configured and accessible via VPN (if required).
+\end{itemize}
+\end{justify}

@@ -1,0 +1,109 @@
+\documentclass[a4paper,12pt]{report}
+
+\usepackage[margin=2cm, bindingoffset=0cm]{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage[Bjornstrup]{fncychap}
+\usepackage{scalefnt}
+\usepackage{mdframed}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{capt-of}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{tikz} 
+\usepackage{pdfpages}
+\usepackage{ragged2e}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{comment}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue}
+\usepackage{array} % Required for new column types
+\usepackage{amsmath}
+\usepackage{longtable}
+
+\definecolor{darkgreen}{rgb}{0, 0.5, 0}
+
+\lstset{ 
+  language=C,
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{blue},
+  commentstyle=\color{darkgreen},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=5pt,
+  backgroundcolor=\color{lightgray!20},
+  showspaces=false,
+  showstringspaces=false,
+  frame=single,
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=4,
+  captionpos=b % Caption position set to bottom
+}
+
+\renewcommand\arraystretch{1.5} 
+
+%%%% ******************************************************* added
+\newcommand{\colortitlechap}{\color[RGB]{0,91,150}} % color of the chapter title <<<
+\newcommand{\colornumberchap}{\color[RGB]{1,31,75}} % color of the chapter number <<<<
+\newcommand{\colorbackchap}{\colorbox[RGB]{179,205,224}} % color of the background rules <<<
+
+\makeatletter
+
+\renewcommand{\DOCH}{%
+    \settowidth{\py}{\CNoV\thechapter}
+    \addtolength{\py}{-10pt}% 
+    \fboxsep=0pt%
+    \colorbackchap{\rule{0pt}{40pt}\parbox[b]{\textwidth}{\hfill}}%
+    \kern-\py\raise20pt%
+    \hbox{\colornumberchap\CNoV\thechapter}\\%
+}
+
+\renewcommand{\DOTI}[1]{%
+    \nointerlineskip\raggedright%
+    \fboxsep=\myhi%
+    \vskip-1ex%
+    \colorbackchap{\parbox[t]{\mylen}{\CTV\FmTi{\colortitlechap#1}}}\par\nobreak%
+    \vskip 40\p@%
+}
+
+\renewcommand{\DOTIS}[1]{%
+    \fboxsep=0pt%
+    \colorbackchap{\rule{0pt}{40pt}\parbox[b]{\textwidth}{\hfill}}\\%
+    \nointerlineskip\raggedright%
+    \fboxsep=\myhi%
+    \colorbackchap{\parbox[t]{\mylen}{\CTV\FmTi{\colortitlechap#1}}}\par\nobreak%
+    \vskip 40\p@%
+}
+
+\makeatother
+%%*******************************************************************************
+
+\pagestyle{fancy}
+\lhead{\scalefont{0.8}\leftmark}
+\rhead{\scalefont{0.8}\rightmark}
+
+\definecolor{sfondo1}{RGB}{179,205,224}
+\definecolor{sfondo2}{RGB}{228,237,242}
+
+\newcommand{\mybox}[4]{
+    \begin{figure}[h]
+        \centering
+    \begin{tikzpicture}
+        \node[anchor=text,text width=\columnwidth-1.2cm, draw, rounded corners, line width=1pt, fill=#3, inner sep=5mm] (big) {\\#4};
+        \node[draw, rounded corners, line width=.5pt, fill=#2, anchor=west, xshift=5mm] (small) at (big.north west) {#1};
+    \end{tikzpicture}
+    \end{figure}
+}
+
+% Definisci un colore verde scuro personalizzato
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0} % Valori RGB (Red, Green, Blue) da 0.0 a 1.0
+
+% Crea il nuovo comando
+\newcommand{\req}[1]{\textcolor{darkgreen}{\texttt{#1}}}
+
