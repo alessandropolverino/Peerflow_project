@@ -2,7 +2,7 @@
 
 A microservices-based peer review platform designed for MOOC environments, enabling teachers to create assignments and students to submit work and evaluate their peers' submissions through structured reviews.
 
-This project was developed by a 3-person team (Ciaravola Giosuè, Della Corte Mario, Alessandro Polverino) in 10 days as the final exam project for the courses "Software Architectures for Enterprise System" and "DevOps Practices" of the Computer Engineering master degree. The implementation particularly focuses on demonstrating enterprise architecture principles and DevOps methodologies. Detailed reports on these topics can be found in the `doc` directory.
+This project was developed by a 3-person team (Ciaravola Giosuè, Della Corte Mario, Polverino Alessandro) in 10 days as the final exam project for the courses "Software Architectures for Enterprise System" and "DevOps Practices" of the Computer Engineering master degree. The implementation particularly focuses on demonstrating enterprise architecture principles and DevOps methodologies. Detailed reports on these topics can be found in the `doc` directory.
 
 ## What the System Does
 
